@@ -11,7 +11,7 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
 
   return res.json({
     configuredKeys,
-    quotaLimit: 1500 * Math.max(configuredKeys, 1),
+    quotaLimit: 3000 + (secondaryGeminiKey ? 1500 : 0),
     resetDate: new Date(Date.now() + 24 * 60 * 60 * 1000).toISOString().split("T")[0],
     status: configuredKeys ? "Active" : "No Gemini key configured",
   });

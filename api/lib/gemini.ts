@@ -2,8 +2,8 @@ import { GoogleGenAI } from "@google/genai";
 
 const primaryGeminiKey = process.env.GEMINI_API_KEY_PRIMARY || process.env.GEMINI_API_KEY || "";
 const secondaryGeminiKey = process.env.GEMINI_API_KEY_SECONDARY || "";
-const primaryGeminiModel = process.env.GEMINI_MODEL_PRIMARY || "gemini-2.5-flash";
-const secondaryGeminiModel = process.env.GEMINI_MODEL_SECONDARY || primaryGeminiModel;
+const primaryGeminiModel = process.env.GEMINI_MODEL_PRIMARY || "gemini-1.5-flash";
+const secondaryGeminiModel = process.env.GEMINI_MODEL_SECONDARY || "gemini-1.5-flash";
 
 export const oncologyOptions = [
   "Oral cavity", "Gall bladder", "Renal", "Vaginal", "Parotid", "Pancreas", "Adrenals", "Sarcoma",
@@ -80,7 +80,7 @@ export async function runGemini(contents: any, systemInstruction?: string, respo
     try {
       const ai = new GoogleGenAI({ apiKey: attempt.key });
       const response = await ai.models.generateContent({
-        model: attempt.model === "auto" ? "gemini-2.5-flash" : attempt.model,
+        model: attempt.model,
         contents,
         config: { systemInstruction, responseMimeType },
       });
