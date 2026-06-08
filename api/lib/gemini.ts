@@ -69,8 +69,6 @@ export function extractJsonObject(text: string) {
   throw new Error("Gemini did not return a JSON object.");
 }
 
-const FALLBACK_MODELS = ["gemini-1.5-pro", "gemini-1.5-flash", "gemini-pro", "gemini-1.0-pro"];
-
 export async function runGemini(contents: any, systemInstruction?: string, responseMimeType?: string) {
   const attempts = [
     { key: primaryGeminiKey, model: primaryGeminiModel },
@@ -78,21 +76,50 @@ export async function runGemini(contents: any, systemInstruction?: string, respo
   ].filter((x) => x.key);
 
   let lastError: any;
+
+  // 1. Try specifically configured models first
   for (const attempt of attempts) {
-    for (const model of [attempt.model, ...FALLBACK_MODELS]) {
-      try {
-        const ai = new GoogleGenAI({ apiKey: attempt.key });
-        const response = await ai.models.generateContent({
-          model: model,
-          contents,
-          config: { systemInstruction, responseMimeType },
-        });
-        return response.text || "";
-      } catch (error) {
-        lastError = error;
-        // Continue to next model if this one fails
-      }
+    try {
+      const ai = new GoogleGenAI({ apiKey: attempt.key });
+      const response = await ai.models.generateContent({
+        model: attempt.model,
+        contents,
+        config: { systemInstruction, responseMimeType },
+      });
+      return response.text || "";
+    } catch (error) {
+      lastError = error;
     }
   }
-  throw lastError || new Error("No Gemini API key configured.");
+
+  // 2. If configured models fail, try dynamic discovery of all available models
+  for (const attempt of attempts) {
+    try {
+      const ai = new GoogleGenAI({ apiKey: attempt.key });
+      
+      // Fetch the latest list of models from the API
+      const modelListResponse = await ai.models.listModels();
+      const availableModels = modelListResponse.models
+        .filter((m: any) => m.supportedMethods?.includes("generateContent"))
+        .map((m: any) => m.name);
+
+      // Try each dynamically discovered model
+      for (const model of availableModels) {
+        try {
+          const response = await ai.models.generateContent({
+            model: model,
+            contents,
+            config: { systemInstruction, responseMimeType },
+          });
+          return response.text || "";
+        } catch (e) {
+          // Continue to the next discovered model
+        }
+      }
+    } catch (e) {
+      // Continue to the next API key
+    }
+  }
+
+  throw lastError || new Error("No Gemini API key configured or no models available.");
 }
