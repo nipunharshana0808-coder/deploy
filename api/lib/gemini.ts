@@ -2,8 +2,8 @@ import { GoogleGenAI } from "@google/genai";
 
 const primaryGeminiKey = process.env.GEMINI_API_KEY_PRIMARY || process.env.GEMINI_API_KEY || "";
 const secondaryGeminiKey = process.env.GEMINI_API_KEY_SECONDARY || "";
-const primaryGeminiModel = process.env.GEMINI_MODEL_PRIMARY || "gemini-1.5-flash";
-const secondaryGeminiModel = process.env.GEMINI_MODEL_SECONDARY || "gemini-1.5-flash";
+const primaryGeminiModel = process.env.GEMINI_MODEL_PRIMARY || "gemini-pro";
+const secondaryGeminiModel = process.env.GEMINI_MODEL_SECONDARY || "gemini-pro";
 
 export const oncologyOptions = [
   "Oral cavity", "Gall bladder", "Renal", "Vaginal", "Parotid", "Pancreas", "Adrenals", "Sarcoma",
@@ -69,6 +69,8 @@ export function extractJsonObject(text: string) {
   throw new Error("Gemini did not return a JSON object.");
 }
 
+const FALLBACK_MODELS = ["gemini-1.5-pro", "gemini-1.5-flash", "gemini-pro", "gemini-1.0-pro"];
+
 export async function runGemini(contents: any, systemInstruction?: string, responseMimeType?: string) {
   const attempts = [
     { key: primaryGeminiKey, model: primaryGeminiModel },
@@ -77,16 +79,19 @@ export async function runGemini(contents: any, systemInstruction?: string, respo
 
   let lastError: any;
   for (const attempt of attempts) {
-    try {
-      const ai = new GoogleGenAI({ apiKey: attempt.key });
-      const response = await ai.models.generateContent({
-        model: attempt.model,
-        contents,
-        config: { systemInstruction, responseMimeType },
-      });
-      return response.text || "";
-    } catch (error) {
-      lastError = error;
+    for (const model of [attempt.model, ...FALLBACK_MODELS]) {
+      try {
+        const ai = new GoogleGenAI({ apiKey: attempt.key });
+        const response = await ai.models.generateContent({
+          model: model,
+          contents,
+          config: { systemInstruction, responseMimeType },
+        });
+        return response.text || "";
+      } catch (error) {
+        lastError = error;
+        // Continue to next model if this one fails
+      }
     }
   }
   throw lastError || new Error("No Gemini API key configured.");
