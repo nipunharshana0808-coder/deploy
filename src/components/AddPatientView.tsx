@@ -70,6 +70,7 @@ interface AddPatientViewProps {
   onNavigateHome: () => void;
   allExistingFiles?: DiskFile[];
   onUploadFile?: (file: { name: string; mimeType: string; size: number; patientId: string; contentBase64: string; extracted: boolean }) => Promise<any>;
+  totalPatientsCount: number;
 }
 
 export default function AddPatientView({ 
@@ -77,11 +78,21 @@ export default function AddPatientView({
   onSavePatient, 
   onNavigateHome,
   allExistingFiles = [],
-  onUploadFile
+  onUploadFile,
+  totalPatientsCount
 }: AddPatientViewProps) {
-
+  
   // Consent checkpoint
   const [consentTaken, setConsentTaken] = useState(initialPatientData ? true : false);
+
+  // Auto-ID generation for new patients
+  const autoId = initialPatientData?.auto_id || `onco-${String(totalPatientsCount + 1).padStart(2, '0')}`;
+  
+  useEffect(() => {
+    if (!initialPatientData) {
+      setFormState(prev => ({ ...prev, auto_id: autoId }));
+    }
+  }, [autoId, initialPatientData]);
 
   // Accordion Section States
   const [openSections, setOpenSections] = useState<Record<string, boolean>>({
@@ -1265,7 +1276,15 @@ export default function AddPatientView({
           {openSections.demographics && (
             <div className="p-5 grid grid-cols-1 md:grid-cols-4 gap-4 text-xs text-slate-700 dark:text-slate-350">
               
-              {/* Initials & Last Name */}
+              {/* Auto ID */}
+              <div>
+                <label className="block font-semibold mb-1 dark:text-slate-400">Auto Generated ID</label>
+                <div className="w-full p-2.5 bg-slate-100 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-xl text-slate-500 dark:text-slate-400 font-mono font-bold">
+                  {formState.auto_id || autoId}
+                </div>
+              </div>
+
+              {/* Title & Initials */}
               <div>
                 <label className="block font-semibold mb-1 dark:text-slate-400">Title</label>
                 <select 

@@ -359,17 +359,19 @@ function AppContent() {
       case "Add Patient":
         return (
           <PageTransition routeKey={routeKey} variant="slide-up">
-            <AddPatientView
-              key={patientUnderEdit ? patientUnderEdit.id : "new_patient"}
-              initialPatientData={patientUnderEdit}
-              onSavePatient={handleSavePatient}
-              onNavigateHome={() => {
-                setPatientUnderEdit(null);
-                setActiveMenu("Home");
-              }}
-              allExistingFiles={allFiles}
-              onUploadFile={handleUploadFile}
-            />
+              <AddPatientView
+               key={patientUnderEdit ? patientUnderEdit.id : "new_patient"}
+               initialPatientData={patientUnderEdit}
+               onSavePatient={handleSavePatient}
+               onNavigateHome={() => {
+                 setPatientUnderEdit(null);
+                 setActiveMenu("Home");
+               }}
+               allExistingFiles={allFiles}
+               onUploadFile={handleUploadFile}
+               totalPatientsCount={allPatients.length}
+             />
+
           </PageTransition>
         );
       case "Search Records":
