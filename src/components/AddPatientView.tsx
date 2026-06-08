@@ -2516,137 +2516,7 @@ export default function AddPatientView({
           )}
         </div>
 
-        {/* Collapsible Section 3b: Supplementary / Additional Details (dynamic AI headings, subheadings, cells) */}
-        <div className="glass-card rounded-2xl overflow-hidden">
-          <button
-            type="button"
-            onClick={() => toggleSection("supplementary")}
-            className={`w-full bg-natural-sidebar/15 dark:bg-white/5 hover:bg-natural-sidebar/25 dark:hover:bg-white/10 p-4 ${openSections.supplementary ? "border-b border-natural-border" : ""} flex justify-between items-center cursor-pointer text-left focus:outline-none transition-all`}
-          >
-            <div className="flex items-center gap-2">
-              <span className="h-6 w-6 rounded-lg bg-amber-500/10 dark:bg-amber-400/20 text-amber-700 dark:text-amber-200 flex items-center justify-center text-xs font-bold ">Sup</span>
-              <h3 className="h-section">Supplementary / Additional Details</h3>
-            </div>
-            <span className={`transition-transform text-slate-500 ${openSections.supplementary ? "rotate-180" : ""}`}>▼</span>
-          </button>
-          {openSections.supplementary && (
-            <div className="p-5 space-y-5">
-              <p className="text-[11px] text-slate-500 dark:text-slate-400 leading-relaxed">
-                Use this section to capture any details that don't fit the standard tables above. The AI adds rows here automatically when the source document contains headings, subheadings, or cells not covered by the predefined schema (e.g. Genetic Testing, Performance Status, Lifestyle, Comorbidities, Staging Details, etc.). Each row is one cell under a heading.
-              </p>
-              <div>
-                <div className="flex justify-between items-center mb-2">
-                  <h4 className="h-subsection">
-                    <span className="inline-block h-2 w-2 rounded-full bg-blue-600 mr-2 align-middle" />Supplementary Details — Heading / Subheading / Cell
-                  </h4>
-                  <button
-                    type="button"
-                    onClick={() => addRow("supplementaryDetailsTable", { detail_heading: "", detail_subheading: "", detail_label: "", detail_value: "", detail_unit: "", detail_date: "", detail_priority: "medium", detail_category: "", detail_source: "", detail_notes: "" })}
-                    className="inline-flex items-center gap-1 text-[11px] font-bold text-blue-600 hover:underline"
-                  >
-                    <Plus className="h-3 w-3" />
-                    <span>Add Supplementary Detail</span>
-                  </button>
-                </div>
-                <div className="overflow-x-auto border border-slate-200 dark:border-slate-700/85 rounded-xl">
-                  <table className="w-full text-left">
-                    <thead>
-                      <tr className="h-table-col">
-                        <th className="p-2.5">Heading</th>
-                        <th className="p-2.5">Subheading</th>
-                        <th className="p-2.5">Label (cell key)</th>
-                        <th className="p-2.5">Value</th>
-                        <th className="p-2.5">Unit</th>
-                        <th className="p-2.5">Date</th>
-                        <th className="p-2.5">Priority</th>
-                        <th className="p-2.5 text-right">Delete</th>
-                      </tr>
-                    </thead>
-                    <tbody className="divide-y divide-[#D9D5CB]/30 dark:divide-slate-800">
-                      {formState.supplementaryDetailsTable?.map((row, idx) => (
-                        <tr key={idx} className={row.detail_heading || row.detail_value ? "ai-priority-row" : ""}>
-                          <td className="p-2">
-                            <input list="supp-heading-list" type="text" value={row.detail_heading} onChange={(e) => handleTableChange("supplementaryDetailsTable", idx, "detail_heading", e.target.value)} placeholder="e.g. Genetic Testing" className={`w-full p-1.5 bg-slate-50 dark:bg-slate-900 border border-slate-200 dark:border-slate-700 rounded-lg text-xs font-bold ${row.detail_heading ? "ai-priority-text" : ""}`} />
-                          </td>
-                          <td className="p-2">
-                            <input type="text" value={row.detail_subheading} onChange={(e) => handleTableChange("supplementaryDetailsTable", idx, "detail_subheading", e.target.value)} placeholder="optional group" className={`w-full p-1.5 bg-slate-50 dark:bg-slate-900 border border-slate-200 dark:border-slate-700 rounded-lg text-xs ${row.detail_subheading ? "ai-priority-text" : ""}`} />
-                          </td>
-                          <td className="p-2">
-                            <input type="text" value={row.detail_label} onChange={(e) => handleTableChange("supplementaryDetailsTable", idx, "detail_label", e.target.value)} placeholder="e.g. BRCA1 variant" className={`w-full p-1.5 bg-slate-50 dark:bg-slate-900 border border-slate-200 dark:border-slate-700 rounded-lg text-xs font-bold ${row.detail_label ? "ai-priority-text" : ""}`} />
-                          </td>
-                          <td className="p-2">
-                            <input type="text" value={row.detail_value} onChange={(e) => handleTableChange("supplementaryDetailsTable", idx, "detail_value", e.target.value)} placeholder="value" className={`w-full p-1.5 bg-slate-50 dark:bg-slate-900 border border-slate-200 dark:border-slate-700 rounded-lg text-xs ${row.detail_value ? "ai-priority-text" : ""}`} />
-                          </td>
-                          <td className="p-2">
-                            <input type="text" value={row.detail_unit} onChange={(e) => handleTableChange("supplementaryDetailsTable", idx, "detail_unit", e.target.value)} placeholder="unit" className={`w-full p-1.5 bg-slate-50 dark:bg-slate-900 border border-slate-200 dark:border-slate-700 rounded-lg text-xs ${row.detail_unit ? "ai-priority-text" : ""}`} />
-                          </td>
-                          <td className="p-2">
-                            <input type="date" value={row.detail_date} onChange={(e) => handleTableChange("supplementaryDetailsTable", idx, "detail_date", e.target.value)} className={`w-full p-1.5 bg-slate-50 dark:bg-slate-900 border border-slate-200 dark:border-slate-700 rounded-lg text-xs ${row.detail_date ? "ai-priority-text" : ""}`} />
-                          </td>
-                          <td className="p-2">
-                            <input type="text" value={row.detail_priority} onChange={(e) => handleTableChange("supplementaryDetailsTable", idx, "detail_priority", e.target.value)} placeholder="e.g. High" className={`w-full p-1.5 bg-slate-50 dark:bg-slate-900 border border-slate-200 dark:border-slate-700 rounded-lg text-xs font-bold ${row.detail_priority ? "ai-priority-text" : ""}`} />
-                          </td>
-                          <td className="p-2 text-right align-top">
-                            <button type="button" onClick={() => removeRow("supplementaryDetailsTable", idx)} className="text-rose-500 hover:text-rose-700 p-1.5 rounded bg-rose-50 dark:bg-rose-950/20">
-                              <Trash className="h-3.5 w-3.5" />
-                            </button>
-                          </td>
-                        </tr>
-                      ))}
-                      {(!formState.supplementaryDetailsTable || formState.supplementaryDetailsTable.length === 0) && (
-                        <tr>
-                          <td colSpan={8} className="text-center py-4 text-slate-400 text-[11px]">No supplementary details yet. AI will fill here automatically, or click "Add Supplementary Detail" to add manually.</td>
-                        </tr>
-                      )}
-                    </tbody>
-                  </table>
-                </div>
-                <datalist id="supp-heading-list">
-                  <option value="Genetic Testing" />
-                  <option value="Family Cancer History" />
-                  <option value="Performance Status" />
-                  <option value="Vitals" />
-                  <option value="Lifestyle" />
-                  <option value="Cardiovascular Risk" />
-                  <option value="Staging Details" />
-                  <option value="Pathology Details" />
-                  <option value="Complications" />
-                  <option value="Pregnancy / Reproductive History" />
-                  <option value="Allergies" />
-                  <option value="Vaccinations" />
-                  <option value="Molecular / NGS" />
-                  <option value="Functional Status" />
-                  <option value="Care Plan" />
-                  <option value="Patient-Reported Outcomes" />
-                  <option value="Adverse Event Logs" />
-                  <option value="Discharge Medications" />
-                  <option value="Discharge Summary" />
-                  <option value="Follow-up Schedule" />
-                  <option value="Comorbidities" />
-                  <option value="Screening Tests" />
-                  <option value="Bone Health" />
-                  <option value="Renal Function" />
-                  <option value="Coagulation" />
-                  <option value="Infectious Disease" />
-                  <option value="Autoimmune" />
-                  <option value="Endocrine" />
-                  <option value="Nutritional Status" />
-                  <option value="Psychosocial" />
-                  <option value="Occupational History" />
-                  <option value="Travel History" />
-                  <option value="Substance Use" />
-                  <option value="Prior Therapies Outside This Encounter" />
-                  <option value="Additional Biopsy Notes" />
-                  <option value="Additional Imaging Notes" />
-                  <option value="Additional Surgery Notes" />
-                  <option value="Additional IHC Notes" />
-                  <option value="Additional Lab Notes" />
-                </datalist>
-              </div>
-            </div>
-          )}
-        </div>
-
+        {/* Collapsible Section 4: Treatment Schedules */}
         {/* Collapsible Section 4: Treatment Schedules */}
         <div className="glass-card rounded-2xl overflow-hidden">
           <button
@@ -3355,6 +3225,137 @@ export default function AddPatientView({
                     )}
                   </tbody>
                 </table>
+              </div>
+            </div>
+          )}
+        </div>
+
+        {/* Collapsible Section 3b: Supplementary / Additional Details (dynamic AI headings, subheadings, cells) */}
+        <div className="glass-card rounded-2xl overflow-hidden">
+          <button
+            type="button"
+            onClick={() => toggleSection("supplementary")}
+            className={`w-full bg-natural-sidebar/15 dark:bg-white/5 hover:bg-natural-sidebar/25 dark:hover:bg-white/10 p-4 ${openSections.supplementary ? "border-b border-natural-border" : ""} flex justify-between items-center cursor-pointer text-left focus:outline-none transition-all`}
+          >
+            <div className="flex items-center gap-2">
+              <span className="h-6 w-6 rounded-lg bg-amber-500/10 dark:bg-amber-400/20 text-amber-700 dark:text-amber-200 flex items-center justify-center text-xs font-bold ">Sup</span>
+              <h3 className="h-section">Supplementary / Additional Details</h3>
+            </div>
+            <span className={`transition-transform text-slate-500 ${openSections.supplementary ? "rotate-180" : ""}`}>▼</span>
+          </button>
+          {openSections.supplementary && (
+            <div className="p-5 space-y-5">
+              <p className="text-[11px] text-slate-500 dark:text-slate-400 leading-relaxed">
+                Use this section to capture any details that don't fit the standard tables above. The AI adds rows here automatically when the source document contains headings, subheadings, or cells not covered by the predefined schema (e.g. Genetic Testing, Performance Status, Lifestyle, Comorbidities, Staging Details, etc.). Each row is one cell under a heading.
+              </p>
+              <div>
+                <div className="flex justify-between items-center mb-2">
+                  <h4 className="h-subsection">
+                    <span className="inline-block h-2 w-2 rounded-full bg-blue-600 mr-2 align-middle" />Supplementary Details — Heading / Subheading / Cell
+                  </h4>
+                  <button
+                    type="button"
+                    onClick={() => addRow("supplementaryDetailsTable", { detail_heading: "", detail_subheading: "", detail_label: "", detail_value: "", detail_unit: "", detail_date: "", detail_priority: "medium", detail_category: "", detail_source: "", detail_notes: "" })}
+                    className="inline-flex items-center gap-1 text-[11px] font-bold text-blue-600 hover:underline"
+                  >
+                    <Plus className="h-3 w-3" />
+                    <span>Add Supplementary Detail</span>
+                  </button>
+                </div>
+                <div className="overflow-x-auto border border-slate-200 dark:border-slate-700/85 rounded-xl">
+                  <table className="w-full text-left">
+                    <thead>
+                      <tr className="h-table-col">
+                        <th className="p-2.5">Heading</th>
+                        <th className="p-2.5">Subheading</th>
+                        <th className="p-2.5">Label (cell key)</th>
+                        <th className="p-2.5">Value</th>
+                        <th className="p-2.5">Unit</th>
+                        <th className="p-2.5">Date</th>
+                        <th className="p-2.5">Priority</th>
+                        <th className="p-2.5 text-right">Delete</th>
+                      </tr>
+                    </thead>
+                    <tbody className="divide-y divide-[#D9D5CB]/30 dark:divide-slate-800">
+                      {formState.supplementaryDetailsTable?.map((row, idx) => (
+                        <tr key={idx} className={row.detail_heading || row.detail_value ? "ai-priority-row" : ""}>
+                          <td className="p-2">
+                            <input list="supp-heading-list" type="text" value={row.detail_heading} onChange={(e) => handleTableChange("supplementaryDetailsTable", idx, "detail_heading", e.target.value)} placeholder="e.g. Genetic Testing" className={`w-full p-1.5 bg-slate-50 dark:bg-slate-900 border border-slate-200 dark:border-slate-700 rounded-lg text-xs font-bold ${row.detail_heading ? "ai-priority-text" : ""}`} />
+                          </td>
+                          <td className="p-2">
+                            <input type="text" value={row.detail_subheading} onChange={(e) => handleTableChange("supplementaryDetailsTable", idx, "detail_subheading", e.target.value)} placeholder="optional group" className={`w-full p-1.5 bg-slate-50 dark:bg-slate-900 border border-slate-200 dark:border-slate-700 rounded-lg text-xs ${row.detail_subheading ? "ai-priority-text" : ""}`} />
+                          </td>
+                          <td className="p-2">
+                            <input type="text" value={row.detail_label} onChange={(e) => handleTableChange("supplementaryDetailsTable", idx, "detail_label", e.target.value)} placeholder="e.g. BRCA1 variant" className={`w-full p-1.5 bg-slate-50 dark:bg-slate-900 border border-slate-200 dark:border-slate-700 rounded-lg text-xs font-bold ${row.detail_label ? "ai-priority-text" : ""}`} />
+                          </td>
+                          <td className="p-2">
+                            <input type="text" value={row.detail_value} onChange={(e) => handleTableChange("supplementaryDetailsTable", idx, "detail_value", e.target.value)} placeholder="value" className={`w-full p-1.5 bg-slate-50 dark:bg-slate-900 border border-slate-200 dark:border-slate-700 rounded-lg text-xs ${row.detail_value ? "ai-priority-text" : ""}`} />
+                          </td>
+                          <td className="p-2">
+                            <input type="text" value={row.detail_unit} onChange={(e) => handleTableChange("supplementaryDetailsTable", idx, "detail_unit", e.target.value)} placeholder="unit" className={`w-full p-1.5 bg-slate-50 dark:bg-slate-900 border border-slate-200 dark:border-slate-700 rounded-lg text-xs ${row.detail_unit ? "ai-priority-text" : ""}`} />
+                          </td>
+                          <td className="p-2">
+                            <input type="date" value={row.detail_date} onChange={(e) => handleTableChange("supplementaryDetailsTable", idx, "detail_date", e.target.value)} className={`w-full p-1.5 bg-slate-50 dark:bg-slate-900 border border-slate-200 dark:border-slate-700 rounded-lg text-xs ${row.detail_date ? "ai-priority-text" : ""}`} />
+                          </td>
+                          <td className="p-2">
+                            <input type="text" value={row.detail_priority} onChange={(e) => handleTableChange("supplementaryDetailsTable", idx, "detail_priority", e.target.value)} placeholder="e.g. High" className={`w-full p-1.5 bg-slate-50 dark:bg-slate-900 border border-slate-200 dark:border-slate-700 rounded-lg text-xs font-bold ${row.detail_priority ? "ai-priority-text" : ""}`} />
+                          </td>
+                          <td className="p-2 text-right align-top">
+                            <button type="button" onClick={() => removeRow("supplementaryDetailsTable", idx)} className="text-rose-500 hover:text-rose-700 p-1.5 rounded bg-rose-50 dark:bg-rose-950/20">
+                              <Trash className="h-3.5 w-3.5" />
+                            </button>
+                          </td>
+                        </tr>
+                      ))}
+                      {(!formState.supplementaryDetailsTable || formState.supplementaryDetailsTable.length === 0) && (
+                        <tr>
+                          <td colSpan={8} className="text-center py-4 text-slate-400 text-[11px]">No supplementary details yet. AI will fill here automatically, or click "Add Supplementary Detail" to add manually.</td>
+                        </tr>
+                      )}
+                    </tbody>
+                  </table>
+                </div>
+                <datalist id="supp-heading-list">
+                  <option value="Genetic Testing" />
+                  <option value="Family Cancer History" />
+                  <option value="Performance Status" />
+                  <option value="Vitals" />
+                  <option value="Lifestyle" />
+                  <option value="Cardiovascular Risk" />
+                  <option value="Staging Details" />
+                  <option value="Pathology Details" />
+                  <option value="Complications" />
+                  <option value="Pregnancy / Reproductive History" />
+                  <option value="Allergies" />
+                  <option value="Vaccinations" />
+                  <option value="Molecular / NGS" />
+                  <option value="Functional Status" />
+                  <option value="Care Plan" />
+                  <option value="Patient-Reported Outcomes" />
+                  <option value="Adverse Event Logs" />
+                  <option value="Discharge Medications" />
+                  <option value="Discharge Summary" />
+                  <option value="Follow-up Schedule" />
+                  <option value="Comorbidities" />
+                  <option value="Screening Tests" />
+                  <option value="Bone Health" />
+                  <option value="Renal Function" />
+                  <option value="Coagulation" />
+                  <option value="Infectious Disease" />
+                  <option value="Autoimmune" />
+                  <option value="Endocrine" />
+                  <option value="Nutritional Status" />
+                  <option value="Psychosocial" />
+                  <option value="Occupational History" />
+                  <option value="Travel History" />
+                  <option value="Substance Use" />
+                  <option value="Prior Therapies Outside This Encounter" />
+                  <option value="Additional Biopsy Notes" />
+                  <option value="Additional Imaging Notes" />
+                  <option value="Additional Surgery Notes" />
+                  <option value="Additional IHC Notes" />
+                  <option value="Additional Lab Notes" />
+                </datalist>
               </div>
             </div>
           )}
