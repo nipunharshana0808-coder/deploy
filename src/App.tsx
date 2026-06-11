@@ -1,0 +1,531 @@
+/**
+ * @license
+ * SPDX-License-Identifier: Apache-2.0
+ */
+
+import React, { useState, useEffect } from "react";
+import { apiFetch } from "./lib/api-client";
+import LoginScreen from "./components/LoginScreen";
+import Sidebar, { MenuType } from "./components/Sidebar";
+import { getFirebaseUserProfile } from "./lib/auth";
+import HomeView from "./components/HomeView";
+import DashboardView from "./components/DashboardView";
+import PatientForm from "./components/PatientForm";
+import SearchRecordsView from "./components/SearchRecordsView";
+import PatientView from "./components/PatientView";
+import SettingsView from "./components/SettingsView";
+import TrashView from "./components/TrashView";
+import { AppDialogProvider, confirmDialog, notify } from "./components/AppDialog";
+import HeroIntro from "./components/HeroIntro";
+import PageTransition from "./components/PageTransition";
+import { SkeletonPatientCard, SkeletonTable } from "./components/Skeleton";
+import type { DiskFile, PatientRecord, UserAccount } from "./types";
+
+const toLegacyPatientSummary = (patient: any): PatientRecord => ({
+  ...patient,
+  id: patient.id || patient.patient_id || patient.record_id || patient.auto_id,
+  auto_id: patient.auto_id || patient.record_id || patient.patient_id || patient.id,
+  bht: patient.bht || patient.bht_no || "",
+  clinic: patient.clinic || patient.clinic_no || "",
+  hospital: patient.hospital || patient.hospital_name || "",
+  ward_no: patient.ward_no || "",
+  oncology: patient.oncology || patient.oncology_type?.[0] || "Other",
+  oncology_types: patient.oncology_types || patient.oncology_type || [],
+  oncology_other: patient.oncology_other || patient.other_oncology_type || "",
+  age: patient.age || patient.age_display || "",
+  status: patient.status || "active",
+  overall_stage: patient.overall_stage || patient.staging_details?.[0]?.overall_stage || "",
+  tnm_stage: patient.tnm_stage || patient.staging_details?.find((row: any) => row.staging_system_name === "TNM")?.overall_stage || "",
+  first_name: patient.first_name || patient.initials || "",
+  date: patient.date || patient.created_at?.slice(0, 10) || patient.createdAt?.slice(0, 10) || "",
+  updatedAt: patient.updatedAt || patient.updated_at || "",
+  createdAt: patient.createdAt || patient.created_at || "",
+} as PatientRecord);
+
+const getPatientLookupId = (patient: any) =>
+  patient?.id || patient?.patient_id || patient?.record_id || patient?.auto_id || "";
+
+const readStorageItem = (storage: Storage, key: string) => {
+  try {
+    return storage.getItem(key);
+  } catch {
+    return null;
+  }
+};
+
+const writeStorageItem = (storage: Storage, key: string, value: string) => {
+  try {
+    storage.setItem(key, value);
+  } catch {
+    // Ignore storage failures so the UI can still render.
+  }
+};
+
+const removeStorageItem = (storage: Storage, key: string) => {
+  try {
+    storage.removeItem(key);
+  } catch {
+    // Ignore storage failures so the UI can still render.
+  }
+};
+
+function AppContent() {
+  const [currentUser, setCurrentUser] = useState<UserAccount | null>(() => {
+    const saved = typeof window !== "undefined" ? readStorageItem(window.localStorage, "onc_auth") : null;
+    if (!saved) return null;
+    try {
+      return JSON.parse(saved);
+    } catch {
+      removeStorageItem(window.localStorage, "onc_auth");
+      return null;
+    }
+  });
+  const [showIntro, setShowIntro] = useState(true);
+  const [introDone, setIntroDone] = useState(() => typeof window !== "undefined" && readStorageItem(window.sessionStorage, "onc_intro_seen") === "1");
+
+  useEffect(() => {
+    if (introDone) setShowIntro(false);
+  }, [introDone]);
+
+  useEffect(() => {
+    if (!currentUser) return;
+
+    const refreshUserProfile = async () => {
+      try {
+        const profile = await getFirebaseUserProfile(currentUser.uid);
+        if (profile) {
+          const updatedUser = {
+            ...currentUser,
+            name: profile.name || currentUser.name,
+            role: profile.role || currentUser.role,
+          };
+          if (updatedUser.name !== currentUser.name || updatedUser.role !== currentUser.role) {
+            setCurrentUser(updatedUser);
+            writeStorageItem(window.localStorage, "onc_auth", JSON.stringify(updatedUser));
+          }
+        }
+      } catch (err) {
+        console.error("Unable to refresh current user profile:", err);
+      }
+    };
+
+    refreshUserProfile();
+  }, [currentUser]);
+
+   const [activeMenu, setActiveMenu] = useState<MenuType>("Home");
+   const [allPatients, setAllPatients] = useState<PatientRecord[]>([]);
+   const [deletedPatients, setDeletedPatients] = useState<PatientRecord[]>([]);
+   const [allFiles, setAllFiles] = useState<DiskFile[]>([]);
+   const [selectedPatient, setSelectedPatient] = useState<PatientRecord | null>(null);
+   const [patientUnderEdit, setPatientUnderEdit] = useState<PatientRecord | null>(null);
+   const [isLoadingMain, setIsLoadingMain] = useState(false);
+
+
+  // Sync dark mode configuration on launch
+  useEffect(() => {
+    const savedTheme = readStorageItem(window.localStorage, "theme");
+    if (savedTheme === "dark") {
+      document.documentElement.classList.add("dark");
+    } else {
+      document.documentElement.classList.remove("dark");
+    }
+
+    const savedStyle = readStorageItem(window.localStorage, "theme-style") || "sage";
+    document.documentElement.classList.remove("theme-sage", "theme-steel", "theme-sunset", "theme-amethyst");
+    document.documentElement.classList.add(`theme-${savedStyle}`);
+  }, []);
+
+  // Fetch all databases logs on session start
+  useEffect(() => {
+    if (currentUser) {
+      fetchClinicalDatabase();
+    }
+  }, [currentUser]);
+
+  const fetchClinicalDatabase = async () => {
+    setIsLoadingMain(true);
+    try {
+      // Patients list, including deleted records so trash can work consistently
+      const patRes = await fetch("/api/patients?includeDeleted=true");
+      if (patRes.ok) {
+        const patientsData = await patRes.json();
+        const normalizedPatients = patientsData.map(toLegacyPatientSummary);
+        setAllPatients(normalizedPatients.filter((p: PatientRecord) => !p.isDeleted));
+        setDeletedPatients(normalizedPatients.filter((p: PatientRecord) => p.isDeleted));
+      }
+      
+      // Virtual Google Drive files list
+      const fileRes = await fetch("/api/files");
+      if (fileRes.ok) {
+        const filesData = await fileRes.json();
+        setAllFiles(filesData);
+      }
+    } catch (err) {
+      console.error("Clinical Server Fetch failed:", err);
+    } finally {
+      setIsLoadingMain(false);
+    }
+  };
+
+  const handleLoginSuccess = (user: UserAccount) => {
+    setCurrentUser(user);
+    writeStorageItem(window.localStorage, "onc_auth", JSON.stringify(user));
+  };
+
+  const handleSignOut = () => {
+    setCurrentUser(null);
+    removeStorageItem(window.localStorage, "onc_auth");
+    setActiveMenu("Home");
+  };
+
+  // Create or Update Patient Record in database
+  const handleSavePatient = async (record: PatientRecord): Promise<PatientRecord> => {
+    const isUpdate = !!record.id;
+    const url = isUpdate ? `/api/patients/${record.id}` : "/api/patients";
+    const method = isUpdate ? "PUT" : "POST";
+
+    const response = await fetch(url, {
+      method: method,
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify(record)
+    });
+
+    if (!response.ok) {
+      throw new Error("Failed to save patient entry");
+    }
+
+    const savedRecord = await response.json();
+    
+    // Refresh lists
+    await fetchClinicalDatabase();
+    
+    // Reset editing point
+    setPatientUnderEdit(null);
+    return savedRecord;
+  };
+
+  // Delete Patient dossiers atomically from DB and Google Drive Virtual Folder
+  const handleDeletePatient = async (id: string) => {
+    const pat = allPatients.find((p) => getPatientLookupId(p) === id);
+    if (!pat) return;
+
+    const confirmed = await confirmDialog(
+      `You are about to move patient '${pat.title ? `${pat.title} ` : ""}${pat.first_name} ${pat.last_name}' to the trash. You can restore it later or permanently purge it from the trash bin.\n\nDo you want to proceed?`,
+      "Regulatory Warning",
+      "danger",
+      "Move to Trash"
+    );
+
+    if (confirmed) {
+      try {
+        const response = await fetch(`/api/patients/${id}`, {
+          method: "DELETE"
+        });
+
+        if (response.ok) {
+          setSelectedPatient(null);
+          await notify("Patient moved to trash.", "Record Moved", "success");
+          await fetchClinicalDatabase();
+        } else {
+          await notify("Database permission limit. Only authorized clinicians can delete histories.", "Delete Failed", "danger");
+        }
+      } catch (err) {
+        await notify("Operation failed due to clinical server timeout.", "Delete Failed", "danger");
+      }
+    }
+  };
+
+  // Upload clinical reports to Google Drive specific patient subdirectory
+  const handleUploadFile = async (payload: { name: string; mimeType: string; size: number; patientId: string; contentBase64: string; extracted: boolean }) => {
+    const response = await fetch("/api/files", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify(payload)
+    });
+
+    if (!response.ok) {
+      throw new Error("Failed to save virtual drive file metadata");
+    }
+
+    // Refresh database files
+    await fetchClinicalDatabase();
+    const uploadedFile = await response.json();
+    return uploadedFile;
+  };
+
+  const handleViewPatient = (patient: PatientRecord) => {
+    setSelectedPatient({
+      ...patient,
+      id: getPatientLookupId(patient),
+    });
+  };
+
+  const handleEditPatient = (patient: PatientRecord) => {
+    setSelectedPatient(null);
+    setPatientUnderEdit({
+      ...patient,
+      id: getPatientLookupId(patient),
+    });
+    setActiveMenu("Add Patient");
+  };
+
+  // Deep Wipe dataset
+  const handleWipeDatabase = async () => {
+    const response = await fetch("/api/wipe", {
+      method: "POST"
+    });
+    if (response.ok) {
+      await fetchClinicalDatabase();
+    } else {
+      throw new Error("Failed to purge db");
+    }
+  };
+
+  // Restore a deleted patient
+  const handleRestorePatient = async (id: string) => {
+    try {
+      const response = await fetch(`/api/patients/${id}/restore`, {
+        method: "POST"
+      });
+      if (response.ok) {
+        await notify("Patient record successfully restored to active registry.", "Restore Success", "success");
+        await fetchClinicalDatabase();
+      } else {
+        throw new Error("Failed to restore patient.");
+      }
+    } catch (err) {
+      await notify("Operation failed. Could not restore patient.", "Restore Failed", "danger");
+    }
+  };
+
+  // Empty the trash bin
+  const handleClearTrash = async () => {
+    const confirmed = await confirmDialog(
+      "Are you sure you want to PERMANENTLY wipe all deleted records? This action cannot be undone and will purge all associated files from the secure storage.",
+      "Regulatory Warning",
+      "danger",
+      "Empty Trash"
+    );
+
+    if (confirmed) {
+      try {
+        const response = await fetch("/api/patients/trash/clear", {
+          method: "POST"
+        });
+        
+        if (!response.ok) {
+          const errorData = await response.json().catch(() => ({}));
+          const errorMessage = errorData.message || "Unknown error occurred while clearing trash.";
+          console.error("Trash clear failed with status:", response.status, "Error:", errorMessage);
+          throw new Error(errorMessage);
+        }
+        
+        await notify("Trash emptied. All deleted records have been permanently purged.", "Purge Success", "success");
+        await fetchClinicalDatabase();
+      } catch (err) {
+        console.error("Trash clear error:", err);
+        let errorMessage = "Operation failed. Could not clear trash.";
+        if (err instanceof Error) {
+          errorMessage = err.message;
+        }
+        await notify(errorMessage, "Purge Failed", "danger");
+      }
+    }
+  };
+
+  // Permanently delete a single trashed patient record and all related assets
+  const handlePermanentlyDeletePatient = async (id: string) => {
+    const confirmed = await confirmDialog(
+      "This action will permanently remove the selected trashed patient and all associated Drive files and folders. This cannot be undone.",
+      "Final Purge",
+      "danger",
+      "Delete Permanently"
+    );
+
+    if (!confirmed) return;
+
+    try {
+      const response = await fetch(`/api/patients/${id}/permanent`, {
+        method: "DELETE"
+      });
+      if (response.ok) {
+        await notify("Deleted record purged permanently.", "Purge Complete", "success");
+        await fetchClinicalDatabase();
+      } else {
+        throw new Error("Failed to permanently delete record.");
+      }
+    } catch (err) {
+      await notify("Operation failed. Could not permanently delete record.", "Purge Failed", "danger");
+    }
+  };
+
+  if (!currentUser) {
+    return <LoginScreen onLoginSuccess={handleLoginSuccess} />;
+  }
+
+  // Active Menu selector routing
+  const renderActiveView = () => {
+    if (selectedPatient) {
+      const selectedPatientId = getPatientLookupId(selectedPatient);
+      return (
+        <PatientView
+          patientId={selectedPatientId}
+          onBack={() => setSelectedPatient(null)}
+          onEdit={(patientId) => {
+            const patient = allPatients.find((item) => getPatientLookupId(item) === patientId);
+            if (patient) handleEditPatient(patient);
+          }}
+          onDelete={handleDeletePatient}
+        />
+      );
+    }
+
+    if (isLoadingMain && allPatients.length === 0) {
+      return (
+        <div className="space-y-6 fade-in">
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+            <SkeletonPatientCard />
+            <SkeletonPatientCard />
+            <SkeletonPatientCard />
+          </div>
+          <SkeletonTable rows={6} cols={5} />
+          <div className="text-center text-slate-400 text-xs font-semibold flex items-center justify-center gap-2">
+            <div className="h-3 w-3 rounded-full border-2 border-[#7A8C70] border-t-transparent animate-spin"></div>
+            <span className="dots-loader">Fetching clinical parameters</span>
+          </div>
+        </div>
+      );
+    }
+
+    const routeKey = `${activeMenu}-${patientUnderEdit?.id ?? "new"}-${selectedPatient?.id ?? "none"}`;
+
+    switch (activeMenu) {
+      case "Home":
+        return (
+          <PageTransition routeKey={routeKey} variant="fade">
+            <HomeView
+              currentUser={currentUser}
+              allPatients={allPatients}
+              onNavigateMenu={setActiveMenu}
+              onViewPatient={handleViewPatient}
+              onEditPatient={handleEditPatient}
+              onDeletePatient={handleDeletePatient}
+            />
+          </PageTransition>
+        );
+      case "Dashboard":
+        return (
+          <PageTransition routeKey={routeKey} variant="scale">
+            <DashboardView allPatients={allPatients} />
+          </PageTransition>
+        );
+      case "Add Patient":
+        return (
+          <PageTransition routeKey={routeKey} variant="slide-up">
+            <PatientForm
+              key={patientUnderEdit ? patientUnderEdit.id : "new_patient"}
+              existingPatientId={patientUnderEdit?.id}
+              onSaveSuccess={async () => {
+                setPatientUnderEdit(null);
+                await fetchClinicalDatabase();
+                setActiveMenu("Home");
+              }}
+              onCancel={() => {
+                setPatientUnderEdit(null);
+                setActiveMenu("Home");
+              }}
+            />
+          </PageTransition>
+        );
+      case "Search Records":
+        return (
+          <PageTransition routeKey={routeKey} variant="slide-left">
+            <SearchRecordsView
+              allPatients={allPatients}
+              onViewPatient={handleViewPatient}
+              onEditPatient={handleEditPatient}
+              onDeletePatient={handleDeletePatient}
+            />
+          </PageTransition>
+        );
+      case "Trash":
+        return (
+          <PageTransition routeKey={routeKey} variant="fade">
+            <TrashView
+              allPatients={deletedPatients}
+              onNavigateMenu={setActiveMenu}
+              onRestorePatient={handleRestorePatient}
+              onClearTrash={handleClearTrash}
+              onPermanentlyDeletePatient={handlePermanentlyDeletePatient}
+              onViewPatient={handleViewPatient}
+            />
+          </PageTransition>
+        );
+      case "Settings":
+        return (
+          <PageTransition routeKey={routeKey} variant="fade">
+            <SettingsView
+              currentUser={currentUser}
+              allPatients={allPatients}
+              onWipeDatabase={handleWipeDatabase}
+            />
+          </PageTransition>
+        );
+      default:
+        return <div className="text-center text-sm py-12 fade-in">Tab under development.</div>;
+    }
+  };
+
+  return (
+    <div className="min-h-screen max-w-full overflow-x-hidden bg-natural-bg transition-colors duration-200 flex flex-col lg:flex-row antialiased relative">
+      {showIntro && (
+        <HeroIntro
+          appName="Oncology Data Manager"
+          tagline="Intelligent clinical dossiers at your fingertips"
+          duration={1700}
+          onDone={() => {
+            setShowIntro(false);
+            setIntroDone(true);
+            sessionStorage.setItem("onc_intro_seen", "1");
+          }}
+        />
+      )}
+
+      {/* Dynamic Ambient Blur Orbs for premium glassmorphism */}
+      <div className="ambient-glow-wrapper">
+        <div className="ambient-glow-1" />
+        <div className="ambient-glow-2" />
+      </div>
+
+      {/* Sidebar Navigation */}
+      <Sidebar
+        activeMenu={activeMenu}
+        onChangeMenu={(menu) => {
+          // If navigating away from Add Patient, discard any edits safely
+          if (menu !== "Add Patient") {
+            setPatientUnderEdit(null);
+          }
+          setActiveMenu(menu);
+        }}
+        currentUser={currentUser}
+        onSignOut={handleSignOut}
+      />
+
+      {/* Main clinical viewport box */}
+      <main className="flex-1 overflow-y-auto px-4 py-6 md:p-8">
+        <div className="max-w-7xl mx-auto space-y-6">
+          {renderActiveView()}
+        </div>
+      </main>
+
+    </div>
+  );
+}
+
+export default function App() {
+  return (
+    <AppDialogProvider>
+      <AppContent />
+    </AppDialogProvider>
+  );
+}
