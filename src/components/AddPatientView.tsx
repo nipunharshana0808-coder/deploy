@@ -6985,7 +6985,7 @@ export default function AddPatientView({
                       </details>
 
                       {/* 2. Baseline Imaging */}
-                      <details className="border border-cyan-200 dark:border-cyan-700/50 rounded-xl overflow-hidden">
+                      <details className="border border-cyan-200 dark:border-cyan-700/50 rounded-xl overflow-hidden" open>
                         <summary className="p-3 bg-cyan-50/50 dark:bg-cyan-950/20 font-bold text-cyan-700 dark:text-cyan-300 cursor-pointer text-[11px]">Baseline Imaging</summary>
                         <div className="p-3 grid grid-cols-1 md:grid-cols-3 gap-3">
                           <div>
@@ -7033,7 +7033,7 @@ export default function AddPatientView({
                       </details>
 
                       {/* 3. Surgical Candidacy */}
-                      <details className="border border-cyan-200 dark:border-cyan-700/50 rounded-xl overflow-hidden">
+                      <details className="border border-cyan-200 dark:border-cyan-700/50 rounded-xl overflow-hidden" open>
                         <summary className="p-3 bg-cyan-50/50 dark:bg-cyan-950/20 font-bold text-cyan-700 dark:text-cyan-300 cursor-pointer text-[11px]">Surgical Candidacy</summary>
                         <div className="p-3 grid grid-cols-1 md:grid-cols-3 gap-3">
                           <div>
@@ -7054,7 +7054,7 @@ export default function AddPatientView({
                       </details>
 
                       {/* 4. Anesthetic Risk */}
-                      <details className="border border-cyan-200 dark:border-cyan-700/50 rounded-xl overflow-hidden">
+                      <details className="border border-cyan-200 dark:border-cyan-700/50 rounded-xl overflow-hidden" open>
                         <summary className="p-3 bg-cyan-50/50 dark:bg-cyan-950/20 font-bold text-cyan-700 dark:text-cyan-300 cursor-pointer text-[11px]">Anesthetic Risk Assessment (ASA)</summary>
                         <div className="p-3 grid grid-cols-1 md:grid-cols-3 gap-3">
                           <div>
@@ -7075,7 +7075,7 @@ export default function AddPatientView({
                       </details>
 
                       {/* 5. Margin Status Expectation */}
-                      <details className="border border-cyan-200 dark:border-cyan-700/50 rounded-xl overflow-hidden">
+                      <details className="border border-cyan-200 dark:border-cyan-700/50 rounded-xl overflow-hidden" open>
                         <summary className="p-3 bg-cyan-50/50 dark:bg-cyan-950/20 font-bold text-cyan-700 dark:text-cyan-300 cursor-pointer text-[11px]">Margin Status Expectation</summary>
                         <div className="p-3 grid grid-cols-1 md:grid-cols-3 gap-3">
                           <div>
@@ -7096,7 +7096,7 @@ export default function AddPatientView({
                       </details>
 
                       {/* 6. Expected Resection Extent */}
-                      <details className="border border-cyan-200 dark:border-cyan-700/50 rounded-xl overflow-hidden">
+                      <details className="border border-cyan-200 dark:border-cyan-700/50 rounded-xl overflow-hidden" open>
                         <summary className="p-3 bg-cyan-50/50 dark:bg-cyan-950/20 font-bold text-cyan-700 dark:text-cyan-300 cursor-pointer text-[11px]">Expected Extent of Resection</summary>
                         <div className="p-3 grid grid-cols-1 md:grid-cols-3 gap-3">
                           <div>
@@ -7114,7 +7114,7 @@ export default function AddPatientView({
                       </details>
 
                       {/* 7. Expected Lymphadenectomy */}
-                      <details className="border border-cyan-200 dark:border-cyan-700/50 rounded-xl overflow-hidden">
+                      <details className="border border-cyan-200 dark:border-cyan-700/50 rounded-xl overflow-hidden" open>
                         <summary className="p-3 bg-cyan-50/50 dark:bg-cyan-950/20 font-bold text-cyan-700 dark:text-cyan-300 cursor-pointer text-[11px]">Expected Lymphadenectomy Extent</summary>
                         <div className="p-3 grid grid-cols-1 md:grid-cols-3 gap-3">
                           <div>
@@ -7136,7 +7136,7 @@ export default function AddPatientView({
                       </details>
 
                       {/* 8. Cardiac Assessment */}
-                      <details className="border border-cyan-200 dark:border-cyan-700/50 rounded-xl overflow-hidden">
+                      <details className="border border-cyan-200 dark:border-cyan-700/50 rounded-xl overflow-hidden" open>
                         <summary className="p-3 bg-cyan-50/50 dark:bg-cyan-950/20 font-bold text-cyan-700 dark:text-cyan-300 cursor-pointer text-[11px]">Cardiac Assessment</summary>
                         <div className="p-3 space-y-3">
                           <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
@@ -7161,7 +7161,7 @@ export default function AddPatientView({
                               </select>
                             </div>
                           </div>
-                          <details className="border border-sky-200 dark:border-sky-700/40 rounded-lg overflow-hidden">
+                          <details className="border border-sky-200 dark:border-sky-700/40 rounded-lg overflow-hidden" open>
                             <summary className="p-2 bg-sky-50/50 dark:bg-sky-950/20 font-bold text-sky-700 dark:text-sky-300 cursor-pointer text-[10px]">RCRI Components {row.cardiac_risk_manual ? '(manual)' : '(auto-calc)'}</summary>
                             <div className="p-2 grid grid-cols-2 md:grid-cols-3 gap-2">
                               {[["rcri_high_risk_surgery", "High-risk surgery (intraperitoneal/intrathoracic/suprainguinal vascular)"], ["rcri_ischemic_heart_disease", "History of ischemic heart disease"], ["rcri_heart_failure", "History of heart failure"], ["rcri_cerebrovascular_disease", "History of cerebrovascular disease"], ["rcri_insulin_diabetes", "Insulin-dependent diabetes"], ["rcri_renal_dysfunction", "Preop creatinine > 2 mg/dL / eGFR < 60"]].map(([fld, lbl]) => (
@@ -7243,7 +7243,7 @@ export default function AddPatientView({
                       </details>
 
                       {/* 9. Pulmonary Assessment */}
-                      <details className="border border-cyan-200 dark:border-cyan-700/50 rounded-xl overflow-hidden">
+                      <details className="border border-cyan-200 dark:border-cyan-700/50 rounded-xl overflow-hidden" open>
                         <summary className="p-3 bg-cyan-50/50 dark:bg-cyan-950/20 font-bold text-cyan-700 dark:text-cyan-300 cursor-pointer text-[11px]">Pulmonary Assessment</summary>
                         <div className="p-3 space-y-3">
                           <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
@@ -7268,7 +7268,7 @@ export default function AddPatientView({
                               </select>
                             </div>
                           </div>
-                          <details className="border border-sky-200 dark:border-sky-700/40 rounded-lg overflow-hidden">
+                          <details className="border border-sky-200 dark:border-sky-700/40 rounded-lg overflow-hidden" open>
                             <summary className="p-2 bg-sky-50/50 dark:bg-sky-950/20 font-bold text-sky-700 dark:text-sky-300 cursor-pointer text-[10px]">Pulmonary Risk Components {row.pulmonary_risk_manual ? '(manual)' : '(auto-calc)'}</summary>
                             <div className="p-2 grid grid-cols-2 md:grid-cols-3 gap-2">
                               {[["pulm_age_risk", "Age > 50 years"], ["pulm_spo2_risk", "Preop SpO2 < 95%"], ["pulm_upper_surgery", "Upper abdominal / thoracic surgery"], ["pulm_copd", "COPD / chronic lung disease"], ["pulm_smoking", "Current smoker"], ["pulm_emergency", "Emergency surgery"]].map(([fld, lbl]) => (
@@ -7347,7 +7347,7 @@ export default function AddPatientView({
                       </details>
 
                       {/* Liver Assessment */}
-                      <details className="border border-cyan-200 dark:border-cyan-700/50 rounded-xl overflow-hidden">
+                      <details className="border border-cyan-200 dark:border-cyan-700/50 rounded-xl overflow-hidden" open>
                         <summary className="p-3 bg-cyan-50/50 dark:bg-cyan-950/20 font-bold text-cyan-700 dark:text-cyan-300 cursor-pointer text-[11px]">Liver Assessment</summary>
                         <div className="p-3 space-y-3">
                           <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
@@ -7451,7 +7451,7 @@ export default function AddPatientView({
                               <input type="text" value={row.liver_notes} onChange={(e) => uf("liver_notes", e.target.value)} placeholder="Hepatology recommendations" className="w-full p-2 bg-theme-surface dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-lg text-xs" />
                             </div>
                           </div>
-                          <details className="border border-sky-200 dark:border-sky-700/40 rounded-lg overflow-hidden">
+                          <details className="border border-sky-200 dark:border-sky-700/40 rounded-lg overflow-hidden" open>
                             <summary className="p-2 bg-sky-50/50 dark:bg-sky-950/20 font-bold text-sky-700 dark:text-sky-300 cursor-pointer text-[10px]">Child-Pugh Components {row.child_pugh_manual ? '(manual)' : '(auto-calc)'}</summary>
                             <div className="p-2 grid grid-cols-2 md:grid-cols-4 gap-2">
                               <div>
@@ -7549,7 +7549,7 @@ export default function AddPatientView({
                       </details>
 
                       {/* Kidney Assessment */}
-                      <details className="border border-cyan-200 dark:border-cyan-700/50 rounded-xl overflow-hidden">
+                      <details className="border border-cyan-200 dark:border-cyan-700/50 rounded-xl overflow-hidden" open>
                         <summary className="p-3 bg-cyan-50/50 dark:bg-cyan-950/20 font-bold text-cyan-700 dark:text-cyan-300 cursor-pointer text-[11px]">Kidney / Renal Assessment</summary>
                         <div className="p-3 space-y-3">
                           <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
@@ -7664,7 +7664,7 @@ export default function AddPatientView({
                       </details>
 
                       {/* 10. Metabolic Risk */}
-                      <details className="border border-cyan-200 dark:border-cyan-700/50 rounded-xl overflow-hidden">
+                      <details className="border border-cyan-200 dark:border-cyan-700/50 rounded-xl overflow-hidden" open>
                         <summary className="p-3 bg-cyan-50/50 dark:bg-cyan-950/20 font-bold text-cyan-700 dark:text-cyan-300 cursor-pointer text-[11px]">Metabolic Risk Assessment</summary>
                         <div className="p-3 grid grid-cols-1 md:grid-cols-4 gap-3">
                           <div>
@@ -7709,7 +7709,7 @@ export default function AddPatientView({
                             <input type="text" value={row.metabolic_notes} onChange={(e) => uf("metabolic_notes", e.target.value)} placeholder="Dietary / endocrine recommendations" className="w-full p-2 bg-theme-surface dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-lg text-xs" />
                           </div>
                         </div>
-                        <details className="border border-sky-200 dark:border-sky-700/40 rounded-lg overflow-hidden mx-3 mb-3">
+                        <details className="border border-sky-200 dark:border-sky-700/40 rounded-lg overflow-hidden mx-3 mb-3" open>
                           <summary className="p-2 bg-sky-50/50 dark:bg-sky-950/20 font-bold text-sky-700 dark:text-sky-300 cursor-pointer text-[10px]">Metabolic Syndrome Components {row.metabolic_risk_manual ? '(manual)' : '(auto-calc)'}</summary>
                           <div className="p-2 grid grid-cols-2 md:grid-cols-4 gap-2">
                             <div>
@@ -7783,7 +7783,7 @@ export default function AddPatientView({
                       </details>
 
                       {/* 11. Immunological Assessment */}
-                      <details className="border border-cyan-200 dark:border-cyan-700/50 rounded-xl overflow-hidden">
+                      <details className="border border-cyan-200 dark:border-cyan-700/50 rounded-xl overflow-hidden" open>
                         <summary className="p-3 bg-cyan-50/50 dark:bg-cyan-950/20 font-bold text-cyan-700 dark:text-cyan-300 cursor-pointer text-[11px]">Immunological Assessment</summary>
                         <div className="p-3 grid grid-cols-1 md:grid-cols-4 gap-3">
                           <div>
@@ -7836,7 +7836,7 @@ export default function AddPatientView({
                       </details>
 
                       {/* 12. POSSUM */}
-                      <details className="border border-cyan-200 dark:border-cyan-700/50 rounded-xl overflow-hidden">
+                      <details className="border border-cyan-200 dark:border-cyan-700/50 rounded-xl overflow-hidden" open>
                         <summary className="p-3 bg-cyan-50/50 dark:bg-cyan-950/20 font-bold text-cyan-700 dark:text-cyan-300 cursor-pointer text-[11px]">POSSUM Predictive Risk Assessment</summary>
                         <div className="p-3 grid grid-cols-1 md:grid-cols-4 gap-3">
                           <div>
@@ -7872,7 +7872,7 @@ export default function AddPatientView({
                             <input type="text" value={row.possum_notes} onChange={(e) => uf("possum_notes", e.target.value)} placeholder="P-POSSUM / modified POSSUM details" className="w-full p-2 bg-theme-surface dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-lg text-xs" />
                           </div>
                         </div>
-                        <details className="border border-sky-200 dark:border-sky-700/40 rounded-lg overflow-hidden mx-3 mb-3">
+                        <details className="border border-sky-200 dark:border-sky-700/40 rounded-lg overflow-hidden mx-3 mb-3" open>
                           <summary className="p-2 bg-sky-50/50 dark:bg-sky-950/20 font-bold text-sky-700 dark:text-sky-300 cursor-pointer text-[10px]">POSSUM Components {row.possum_phys_manual === 'manual' || row.possum_op_manual === 'manual' ? '(manual)' : '(auto-calc)'}</summary>
                           <div className="p-2 space-y-2">
                             <h6 className="text-[9px] font-bold text-sky-600 dark:text-sky-400">Physiological Parameters</h6>
@@ -7980,7 +7980,7 @@ export default function AddPatientView({
                       </details>
 
                       {/* 13. Neo-Adjuvant Chemo Response */}
-                      <details className="border border-cyan-200 dark:border-cyan-700/50 rounded-xl overflow-hidden">
+                      <details className="border border-cyan-200 dark:border-cyan-700/50 rounded-xl overflow-hidden" open>
                         <summary className="p-3 bg-cyan-50/50 dark:bg-cyan-950/20 font-bold text-cyan-700 dark:text-cyan-300 cursor-pointer text-[11px]">Neo-Adjuvant Chemotherapy Response</summary>
                         <div className="p-3 grid grid-cols-1 md:grid-cols-4 gap-3">
                           <div>
@@ -8020,7 +8020,7 @@ export default function AddPatientView({
                             <input type="text" value={row.neoadj_chemo_response_details} onChange={(e) => uf("neoadj_chemo_response_details", e.target.value)} placeholder="e.g. 90% tumor regression, ypT2N0" className="w-full p-2 bg-theme-surface dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-lg text-xs" />
                           </div>
                         </div>
-                        <details className="border border-sky-200 dark:border-sky-700/40 rounded-lg overflow-hidden mx-3 mb-3">
+                        <details className="border border-sky-200 dark:border-sky-700/40 rounded-lg overflow-hidden mx-3 mb-3" open>
                           <summary className="p-2 bg-sky-50/50 dark:bg-sky-950/20 font-bold text-sky-700 dark:text-sky-300 cursor-pointer text-[10px]">RECIST Target Lesions {row.neoadj_chemo_manual ? '(manual)' : '(auto-calc)'}</summary>
                           <div className="p-2 grid grid-cols-2 md:grid-cols-4 gap-2">
                             <div>
@@ -8081,7 +8081,7 @@ export default function AddPatientView({
                       </details>
 
                       {/* 14. Neo-Adjuvant Radio Response */}
-                      <details className="border border-cyan-200 dark:border-cyan-700/50 rounded-xl overflow-hidden">
+                      <details className="border border-cyan-200 dark:border-cyan-700/50 rounded-xl overflow-hidden" open>
                         <summary className="p-3 bg-cyan-50/50 dark:bg-cyan-950/20 font-bold text-cyan-700 dark:text-cyan-300 cursor-pointer text-[11px]">Neo-Adjuvant Radiotherapy Response</summary>
                         <div className="p-3 grid grid-cols-1 md:grid-cols-4 gap-3">
                           <div>
@@ -8124,7 +8124,7 @@ export default function AddPatientView({
                       </details>
 
                       {/* 15. Organ-Specific Resistance Testing */}
-                      <details className="border border-cyan-200 dark:border-cyan-700/50 rounded-xl overflow-hidden">
+                      <details className="border border-cyan-200 dark:border-cyan-700/50 rounded-xl overflow-hidden" open>
                         <summary className="p-3 bg-cyan-50/50 dark:bg-cyan-950/20 font-bold text-cyan-700 dark:text-cyan-300 cursor-pointer text-[11px]">Organ-Specific Resistance Testing</summary>
                         <div className="p-3 grid grid-cols-1 md:grid-cols-3 gap-3">
                           <div>
@@ -8146,7 +8146,7 @@ export default function AddPatientView({
                       </details>
 
                       {/* 16. MDT Discussion */}
-                      <details className="border border-cyan-200 dark:border-cyan-700/50 rounded-xl overflow-hidden">
+                      <details className="border border-cyan-200 dark:border-cyan-700/50 rounded-xl overflow-hidden" open>
                         <summary className="p-3 bg-cyan-50/50 dark:bg-cyan-950/20 font-bold text-cyan-700 dark:text-cyan-300 cursor-pointer text-[11px]">MDT Discussion Details</summary>
                         <div className="p-3 space-y-3">
                           <div className="grid grid-cols-1 md:grid-cols-3 gap-3">
@@ -8323,7 +8323,7 @@ export default function AddPatientView({
                     </details>
 
                     {/* Intra-operative Details */}
-                    <details className="group border border-sky-200 dark:border-sky-800 rounded-lg p-2 open:pb-3">
+                    <details className="group border border-sky-200 dark:border-sky-800 rounded-lg p-2 open:pb-3" open>
                       <summary className="text-[10px] font-bold text-sky-600 dark:text-sky-400 uppercase tracking-wider cursor-pointer select-none">Intra-operative Details</summary>
                       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3 mt-2">
                         <div>
@@ -8392,7 +8392,7 @@ export default function AddPatientView({
                     </details>
 
                     {/* Approach & Resection */}
-                    <details className="group border border-sky-200 dark:border-sky-800 rounded-lg p-2 open:pb-3">
+                    <details className="group border border-sky-200 dark:border-sky-800 rounded-lg p-2 open:pb-3" open>
                       <summary className="text-[10px] font-bold text-sky-600 dark:text-sky-400 uppercase tracking-wider cursor-pointer select-none">Approach & Resection</summary>
                       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3 mt-2">
                         <div>
@@ -8521,7 +8521,7 @@ export default function AddPatientView({
                     </details>
 
                     {/* Reconstruction & Post-operative */}
-                    <details className="group border border-sky-200 dark:border-sky-800 rounded-lg p-2 open:pb-3">
+                    <details className="group border border-sky-200 dark:border-sky-800 rounded-lg p-2 open:pb-3" open>
                       <summary className="text-[10px] font-bold text-sky-600 dark:text-sky-400 uppercase tracking-wider cursor-pointer select-none">Reconstruction & Post-operative</summary>
                       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3 mt-2">
                         <div>
@@ -8650,7 +8650,7 @@ export default function AddPatientView({
                     </div>
 
                     {/* Surgery Outcome */}
-                    <details className="group border border-amber-200 dark:border-amber-800 rounded-lg p-2 open:pb-3">
+                    <details className="group border border-amber-200 dark:border-amber-800 rounded-lg p-2 open:pb-3" open>
                       <summary className="text-[10px] font-bold text-amber-600 dark:text-amber-400 uppercase tracking-wider cursor-pointer select-none">Surgery Outcome</summary>
                       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3 mt-2">
                         <div>
@@ -8913,7 +8913,7 @@ export default function AddPatientView({
                       </div>
 
                       {/* Post-op Monitoring */}
-                      <details className="group border border-amber-200 dark:border-amber-800 rounded-lg p-2">
+                      <details className="group border border-amber-200 dark:border-amber-800 rounded-lg p-2" open>
                         <summary className="text-[10px] font-bold text-amber-600 dark:text-amber-400 uppercase tracking-wider cursor-pointer select-none">Post-op Monitoring</summary>
                         {(row.postop_monitoring || []).map((mon: any, mi: number) => {
                           const updateMon = (field: string, value: string) => {
@@ -8984,7 +8984,7 @@ export default function AddPatientView({
                       </details>
 
                       {/* Post-op Complications */}
-                      <details className="group border border-amber-200 dark:border-amber-800 rounded-lg p-2">
+                      <details className="group border border-amber-200 dark:border-amber-800 rounded-lg p-2" open>
                         <summary className="text-[10px] font-bold text-amber-600 dark:text-amber-400 uppercase tracking-wider cursor-pointer select-none">Post-op Complications</summary>
                         <div className="grid grid-cols-1 gap-2 mt-2">
                           <div>
@@ -9118,7 +9118,7 @@ export default function AddPatientView({
                     </div>
 
                     {/* Treatment Timeline */}
-                    <details className="group border border-violet-200 dark:border-violet-800 rounded-lg p-2">
+                    <details className="group border border-violet-200 dark:border-violet-800 rounded-lg p-2" open>
                       <summary className="text-[10px] font-bold text-violet-600 dark:text-violet-400 uppercase tracking-wider cursor-pointer select-none">Treatment Timeline & Intensity</summary>
                       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3 mt-2">
                         <div>
@@ -9258,7 +9258,7 @@ export default function AddPatientView({
                     </details>
 
                     {/* Quality of Life & Functional Recovery */}
-                    <details className="group border border-teal-200 dark:border-teal-800 rounded-lg p-2 open:pb-3">
+                    <details className="group border border-teal-200 dark:border-teal-800 rounded-lg p-2 open:pb-3" open>
                       <summary className="text-[10px] font-bold text-teal-600 dark:text-teal-400 uppercase tracking-wider cursor-pointer select-none">QoL &amp; Functional Recovery</summary>
                       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3 mt-2">
                         <div>
@@ -9297,7 +9297,7 @@ export default function AddPatientView({
                     </details>
 
                     {/* Genetics, Trials & Readmission */}
-                    <details className="group border border-teal-200 dark:border-teal-800 rounded-lg p-2 open:pb-3">
+                    <details className="group border border-teal-200 dark:border-teal-800 rounded-lg p-2 open:pb-3" open>
                       <summary className="text-[10px] font-bold text-teal-600 dark:text-teal-400 uppercase tracking-wider cursor-pointer select-none">Genetics, Trials &amp; Readmission</summary>
                       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3 mt-2">
                         <div>
@@ -9439,7 +9439,7 @@ export default function AddPatientView({
                       </div>
                     </details>
 
-                    <details className="group border border-amber-200 dark:border-amber-800 rounded-lg p-2 open:pb-3">
+                    <details className="group border border-amber-200 dark:border-amber-800 rounded-lg p-2 open:pb-3" open>
                       <summary className="text-[10px] font-bold text-amber-600 dark:text-amber-400 uppercase tracking-wider cursor-pointer select-none">Progression &amp; Recurrence</summary>
                       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3 mt-2">
                         <div>
@@ -9464,7 +9464,7 @@ export default function AddPatientView({
                       </div>
                     </details>
 
-                    <details className="group border border-amber-200 dark:border-amber-800 rounded-lg p-2 open:pb-3">
+                    <details className="group border border-amber-200 dark:border-amber-800 rounded-lg p-2 open:pb-3" open>
                       <summary className="text-[10px] font-bold text-amber-600 dark:text-amber-400 uppercase tracking-wider cursor-pointer select-none">Survival &amp; Follow-up</summary>
                       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3 mt-2">
                         <div>
