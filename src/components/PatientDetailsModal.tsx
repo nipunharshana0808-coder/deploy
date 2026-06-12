@@ -52,6 +52,211 @@ interface PatientDetailsModalProps {
   onUploadFile: (file: { name: string; mimeType: string; size: number; patientId: string; contentBase64: string; extracted: boolean }) => Promise<any>;
 }
 
+const seededDefaults: Record<string, string> = {
+  source: "Manual",
+  tumor_size_unit: "mm",
+  detail_priority: "medium",
+  imaging_type: "CT Chest/Abdomen",
+  imaging_purpose: "Diagnosis",
+  endo_type: "Colonoscopy",
+  endo_purpose: "Diagnosis",
+  biopsy_type: "True-cut Biopsy",
+  biopsy_purpose: "confirmation",
+  ihc_method: "IHC",
+};
+
+const hasClinicalValue = (value: unknown, key = ""): boolean => {
+  if (value === null || value === undefined || value === false) return false;
+  if (typeof value === "string") {
+    const trimmed = value.trim();
+    if (!trimmed) return false;
+    return seededDefaults[key] !== trimmed;
+  }
+  if (typeof value === "number") return true;
+  if (Array.isArray(value)) return value.some((item) => hasClinicalValue(item));
+  if (typeof value === "object") {
+    return Object.entries(value as Record<string, unknown>)
+      .some(([childKey, childValue]) => hasClinicalValue(childValue, childKey));
+  }
+  return true;
+};
+
+const clinicalLabel = (key: string) => {
+  const abbreviations: Record<string, string> = {
+    asa: "ASA",
+    bclc: "BCLC",
+    bmi: "BMI",
+    bnp: "BNP",
+    ckd: "CKD",
+    crp: "CRP",
+    ecg: "ECG",
+    ecog: "ECOG",
+    egfr: "eGFR",
+    figo: "FIGO",
+    hba1c: "HbA1c",
+    hklc: "HKLC",
+    hiv: "HIV",
+    icu: "ICU",
+    ihc: "IHC",
+    inr: "INR",
+    iss: "ISS",
+    ki67: "Ki-67",
+    mdt: "MDT",
+    meld: "MELD",
+    mpr: "MPR",
+    ngs: "NGS",
+    possum: "POSSUM",
+    rcri: "RCRI",
+    recist: "RECIST",
+    riss: "R-ISS",
+    tnm: "TNM",
+    who: "WHO",
+  };
+  return key
+    .split("_")
+    .map((part) => abbreviations[part.toLowerCase()] || part.charAt(0).toUpperCase() + part.slice(1))
+    .join(" ");
+};
+
+const displayClinicalValue = (value: unknown): string => {
+  if (typeof value === "boolean") return value ? "Yes" : "No";
+  if (value === null || value === undefined) return "—";
+  if (Array.isArray(value)) {
+    return value
+      .filter((item) => hasClinicalValue(item))
+      .map((item) => displayClinicalValue(item))
+      .join("; ") || "—";
+  }
+  if (typeof value === "object") {
+    return Object.entries(value as Record<string, unknown>)
+      .filter(([key, childValue]) => hasClinicalValue(childValue, key))
+      .map(([key, childValue]) => `${clinicalLabel(key)}: ${displayClinicalValue(childValue)}`)
+      .join(", ") || "—";
+  }
+  return String(value);
+};
+
+const recordRows = (value: unknown): Array<Record<string, unknown>> =>
+  Array.isArray(value) ? value as Array<Record<string, unknown>> : [];
+
+function StructuredClinicalSection({
+  title,
+  rows,
+}: {
+  title: string;
+  rows: Array<Record<string, unknown>> | undefined;
+}) {
+  const visibleRows = (rows || []).filter((row) => hasClinicalValue(row));
+  if (visibleRows.length === 0) return null;
+
+  return (
+    <div className="border border-natural-border dark:border-natural-border rounded-xl overflow-hidden shadow-xs">
+      <div className="p-3 bg-natural-card dark:bg-slate-850 h-subsection border-b border-natural-border dark:border-natural-border text-slate-800 dark:text-theme-on-accent">
+        {title}
+      </div>
+      <div className="p-3 space-y-3">
+        {visibleRows.map((row, rowIndex) => {
+          const scalarEntries = Object.entries(row).filter(
+            ([key, value]) => !Array.isArray(value) && hasClinicalValue(value, key)
+          );
+          const nestedEntries = Object.entries(row).filter(
+            ([, value]) => Array.isArray(value) && hasClinicalValue(value)
+          ) as Array<[string, unknown[]]>;
+          const entryTitle =
+            row.primary_cancer_site ||
+            row.surgery_name ||
+            row.grading_system ||
+            row.staging_system ||
+            row.therapy_type ||
+            row.assessment_date ||
+            `Entry ${rowIndex + 1}`;
+
+          return (
+            <div key={rowIndex} className="rounded-xl border border-natural-border/70 dark:border-slate-700 overflow-hidden">
+              <div className="px-3 py-2 bg-slate-50/70 dark:bg-slate-900/35 font-bold text-slate-700 dark:text-slate-200">
+                {displayClinicalValue(entryTitle)}
+              </div>
+              {scalarEntries.length > 0 && (
+                <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-px bg-natural-border/60 dark:bg-slate-700">
+                  {scalarEntries.map(([key, value]) => (
+                    <div key={key} className="bg-theme-surface dark:bg-slate-850 p-2.5 min-w-0">
+                      <div className="text-[9px] uppercase tracking-wide font-bold text-slate-500 dark:text-slate-400">
+                        {clinicalLabel(key)}
+                      </div>
+                      <div className="mt-1 text-xs font-semibold text-slate-800 dark:text-slate-200 whitespace-pre-wrap break-words">
+                        {displayClinicalValue(value)}
+                      </div>
+                    </div>
+                  ))}
+                </div>
+              )}
+              {nestedEntries.map(([key, nestedRows]) => {
+                const visibleNestedRows = nestedRows.filter((nestedRow) => hasClinicalValue(nestedRow));
+                if (visibleNestedRows.length === 0) return null;
+                return (
+                  <div key={key} className="border-t border-natural-border/70 dark:border-slate-700 p-3">
+                    <div className="h-group mb-2 text-slate-600 dark:text-slate-300">{clinicalLabel(key)}</div>
+                    <div className="space-y-2">
+                      {visibleNestedRows.map((nestedRow, nestedIndex) => {
+                        if (typeof nestedRow !== "object" || nestedRow === null) {
+                          return (
+                            <div key={nestedIndex} className="rounded-lg bg-slate-50/60 dark:bg-slate-900/30 p-2 text-[11px] font-semibold text-slate-700 dark:text-slate-200">
+                              {displayClinicalValue(nestedRow)}
+                            </div>
+                          );
+                        }
+                        return (
+                          <div key={nestedIndex} className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-2 rounded-lg bg-slate-50/60 dark:bg-slate-900/30 p-2">
+                            {Object.entries(nestedRow as Record<string, unknown>)
+                              .filter(([nestedKey, nestedValue]) => hasClinicalValue(nestedValue, nestedKey))
+                              .map(([nestedKey, nestedValue]) => (
+                                <div key={nestedKey} className="min-w-0">
+                                  <span className="text-[9px] uppercase font-bold text-slate-500 dark:text-slate-400">
+                                    {clinicalLabel(nestedKey)}:
+                                  </span>{" "}
+                                  <span className="text-[11px] font-semibold text-slate-700 dark:text-slate-200 break-words">
+                                    {displayClinicalValue(nestedValue)}
+                                  </span>
+                                </div>
+                              ))}
+                          </div>
+                        );
+                      })}
+                    </div>
+                  </div>
+                );
+              })}
+            </div>
+          );
+        })}
+      </div>
+    </div>
+  );
+}
+
+function StructuredClinicalGroup({
+  title,
+  sections,
+}: {
+  title: string;
+  sections: Array<{ title: string; rows: Array<Record<string, unknown>> }>;
+}) {
+  const visibleSections = sections.filter((section) => section.rows.some((row) => hasClinicalValue(row)));
+  if (visibleSections.length === 0) return null;
+
+  return (
+    <div className="space-y-3">
+      <div className="flex items-center gap-2 px-1">
+        <FileCheck2 className="h-4 w-4 text-natural-accent dark:text-natural-gold" />
+        <h3 className="h-section">{title}</h3>
+      </div>
+      {visibleSections.map((section) => (
+        <StructuredClinicalSection key={section.title} title={section.title} rows={section.rows} />
+      ))}
+    </div>
+  );
+}
+
 export default function PatientDetailsModal({
   patient,
   onClose,
@@ -844,6 +1049,83 @@ export default function PatientDetailsModal({
                     </tbody>
                   </table>
                 </div>
+
+                <StructuredClinicalGroup
+                  title="Clinical History & Functional Assessment"
+                  sections={[
+                    {
+                      title: "Clinical Assessment Summary",
+                      rows: [{
+                        charlson_index: normalizedPatient.charlson_index,
+                        charlson_conditions: normalizedPatient.charlson_conditions,
+                        hospital_admissions: normalizedPatient.hospital_admissions,
+                        ecog_status: normalizedPatient.ecog_status,
+                        functional_adl_score: normalizedPatient.functional_adl_score,
+                        functional_adl_items: normalizedPatient.functional_adl_items,
+                        functional_iadl_score: normalizedPatient.functional_iadl_score,
+                        functional_iadl_items: normalizedPatient.functional_iadl_items,
+                        allergy_food: normalizedPatient.allergy_food,
+                        allergy_drugs: normalizedPatient.allergy_drugs,
+                        allergy_plasters: normalizedPatient.allergy_plasters,
+                        allergy_other: normalizedPatient.allergy_other,
+                      }],
+                    },
+                    { title: "Presenting Complaints Timeline", rows: recordRows(normalizedPatient.presentingComplaintsTable) },
+                    { title: "Past Medical History", rows: recordRows(normalizedPatient.pastMedicalTable) },
+                    { title: "Past Surgical History", rows: recordRows(normalizedPatient.pastSurgicalTable) },
+                    { title: "Prior Chemotherapy", rows: recordRows(normalizedPatient.priorChemoTable) },
+                    { title: "Prior Radiotherapy", rows: recordRows(normalizedPatient.priorRadioTable) },
+                    { title: "Prior Immunotherapy", rows: recordRows(normalizedPatient.priorImmunoTable) },
+                    { title: "Prior Hormonal Therapy", rows: recordRows(normalizedPatient.priorHormoneTable) },
+                    { title: "Prior Targeted Therapy", rows: recordRows(normalizedPatient.priorTargetedTable) },
+                    { title: "Systemic Inquiry", rows: recordRows(normalizedPatient.systemicInquiry) },
+                    { title: "Anthropometric Measurements", rows: recordRows(normalizedPatient.anthropometricTable) },
+                    { title: "Other Anthropometric Measurements", rows: recordRows(normalizedPatient.otherAnthropometricTable) },
+                  ]}
+                />
+
+                <StructuredClinicalGroup
+                  title="Extended Investigations"
+                  sections={[
+                    { title: "Endoscopy", rows: recordRows(normalizedPatient.endoscopyTable) },
+                    { title: "Other Investigations", rows: recordRows(normalizedPatient.otherInvTable) },
+                    { title: "Genetic & Molecular Testing", rows: recordRows(normalizedPatient.geneticTable) },
+                    { title: "Contrast Studies", rows: recordRows(normalizedPatient.contrastTable) },
+                    { title: "Additional Staging Records", rows: recordRows(normalizedPatient.stagingTable) },
+                  ]}
+                />
+
+                <StructuredClinicalGroup
+                  title="Tumour Characteristics, Staging & Grading"
+                  sections={[
+                    { title: "Tumour Characteristics by Primary Cancer Site", rows: recordRows(normalizedPatient.tumorCharacteristicsTable) },
+                    { title: "Clinical & Pathological Staging", rows: recordRows(normalizedPatient.clinicalStagingTable) },
+                    { title: "Histology & Grading", rows: recordRows(normalizedPatient.histologyGradingTable) },
+                  ]}
+                />
+
+                <StructuredClinicalGroup
+                  title="Surgical Assessment, Outcomes & Prognosis"
+                  sections={[
+                    { title: "Adjuvant Therapy", rows: recordRows(normalizedPatient.adjuvantTherapyTable) },
+                    { title: "Pre-Operative Assessment", rows: recordRows(normalizedPatient.preOperativeAssessmentTable) },
+                    { title: "Definitive Surgery", rows: recordRows(normalizedPatient.definitiveSurgeryTable) },
+                    { title: "Surgical Outcome Assessment", rows: recordRows(normalizedPatient.treatmentOutcomeTable) },
+                    { title: "After-Surgical Therapies", rows: recordRows(normalizedPatient.afterSurgicalTherapiesTable) },
+                    { title: "Follow-up & Prognosis", rows: recordRows(normalizedPatient.followUpPrognosisTable) },
+                    { title: "Oncological Outcome", rows: recordRows(normalizedPatient.oncologicalOutcomeTable) },
+                  ]}
+                />
+
+                <StructuredClinicalGroup
+                  title="Care Plan & Preserved Clinical Data"
+                  sections={[
+                    { title: "Problems & Management Plans", rows: recordRows(normalizedPatient.problemTable) },
+                    { title: "Supportive & Common Medications", rows: recordRows(normalizedPatient.commonDrugsTable) },
+                    { title: "Unmapped Medical Information", rows: recordRows(normalizedPatient.unmapped_medical_information) },
+                    { title: "Source File Clinical Summaries", rows: recordRows(normalizedPatient.source_file_summaries) },
+                  ]}
+                />
 
                 {/* Supplementary / Additional Details (grouped by heading) */}
                 {normalizedPatient.supplementaryDetailsTable && normalizedPatient.supplementaryDetailsTable.length > 0 && (() => {
