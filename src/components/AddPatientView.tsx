@@ -2295,6 +2295,19 @@ export default function AddPatientView({
               </div>
 
               <div>
+                <label className="block font-bold mb-1 text-slate-800 dark:text-slate-300">First Name *</label>
+                <input
+                  ref={firstNameRef}
+                  type="text"
+                  name="first_name"
+                  value={formState.first_name}
+                  onChange={handleInputChange}
+                  placeholder="First name e.g. John"
+                  className={`w-full p-2.5 bg-slate-50 dark:bg-slate-900 border border-slate-200 dark:border-slate-700 rounded-xl ${extractedFields.has("first_name") ? "ai-extracted-glow" : ""}`}
+                />
+              </div>
+
+              <div>
                 <label className="block font-bold mb-1 text-slate-800 dark:text-slate-300">Last Name *</label>
                 <input
                   ref={lastNameRef}
