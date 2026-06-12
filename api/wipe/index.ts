@@ -1,6 +1,6 @@
 import type { VercelRequest, VercelResponse } from "@vercel/node";
-import { listCollection, deleteDocument } from "../lib/firebase.js";
-import { deleteDriveFile, recursivelyDeleteDriveFolder } from "../lib/drive.js";
+import { listCollection, deleteDocument } from "../../server-lib/firebase.js";
+import { deleteDriveFile, recursivelyDeleteDriveFolder } from "../../server-lib/drive.js";
 
 export default async function handler(req: VercelRequest, res: VercelResponse) {
   if (req.method !== "POST") {
@@ -35,7 +35,7 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
     const driveFolderId = process.env.DRIVE_FOLDER_ID || process.env.GOOGLE_DRIVE_FOLDER_ID || process.env.VITE_DRIVE_ROOT_FOLDER_ID;
 
     if (driveFolderId) {
-      const { getDriveAccessToken } = await import("../lib/drive.js");
+      const { getDriveAccessToken } = await import("../../server-lib/drive.js");
       try {
         const token = await getDriveAccessToken();
         let pageToken: string | null = null;

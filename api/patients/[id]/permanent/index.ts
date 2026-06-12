@@ -1,6 +1,6 @@
 import type { VercelRequest, VercelResponse } from "@vercel/node";
-import { getFirestoreDoc, deleteDocument } from "../../../lib/firebase.js";
-import { wipePatientAssets } from "../../../lib/drive.js";
+import { getFirestoreDoc, deleteDocument } from "../../../../server-lib/firebase.js";
+import { wipePatientAssets } from "../../../../server-lib/drive.js";
 
 export default async function handler(req: VercelRequest, res: VercelResponse) {
   const { id } = req.query;

@@ -1,7 +1,7 @@
 import type { VercelRequest, VercelResponse } from "@vercel/node";
-import { listCollection, saveDocument } from "../lib/firebase.js";
-import { ensureDriveFolder, uploadToDrive } from "../lib/drive.js";
-import { runGemini, extractJsonObject, normalizeExtraction } from "../lib/gemini.js";
+import { listCollection, saveDocument } from "../../server-lib/firebase.js";
+import { ensureDriveFolder, uploadToDrive } from "../../server-lib/drive.js";
+import { runGemini, extractJsonObject, normalizeExtraction } from "../../server-lib/gemini.js";
 
 function newId(prefix: string) {
   return `${prefix}_${Math.random().toString(36).substring(2, 10)}`;

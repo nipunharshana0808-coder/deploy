@@ -1,5 +1,5 @@
 import type { VercelRequest, VercelResponse } from "@vercel/node";
-import { saveDocument, getFirestoreDoc } from "../../../lib/firebase.js";
+import { saveDocument, getFirestoreDoc } from "../../../../server-lib/firebase.js";
 
 export default async function handler(req: VercelRequest, res: VercelResponse) {
   const { id } = req.query;

@@ -1,6 +1,6 @@
 import type { VercelRequest, VercelResponse } from "@vercel/node";
-import { listCollection, saveDocument, getFirestoreDoc } from "../lib/firebase.js";
-import { ensureDriveFolder, uploadToDrive } from "../lib/drive.js";
+import { listCollection, saveDocument, getFirestoreDoc } from "../../server-lib/firebase.js";
+import { ensureDriveFolder, uploadToDrive } from "../../server-lib/drive.js";
 
 function newId(prefix: string) {
   return `${prefix}_${Math.random().toString(36).substring(2, 10)}`;
