@@ -564,6 +564,7 @@ export default function AddPatientView({
   const [vaultProgress, setVaultProgress] = useState(0);
   const [vaultStage, setVaultStage] = useState("");
   const [extractedFields, setExtractedFields] = useState<Set<string>>(new Set());
+  const seededDefaultRowsRef = useRef(false);
   const fileInputRef = useRef<HTMLInputElement>(null);
   const vaultFileInputRef = useRef<HTMLInputElement>(null);
   const sectionFileInputRef = useRef<HTMLInputElement>(null);
@@ -740,6 +741,112 @@ export default function AddPatientView({
       setFormState(initialPatientData);
       setConsentTaken(true);
     }
+  }, [initialPatientData]);
+
+  useEffect(() => {
+    if (initialPatientData || seededDefaultRowsRef.current) return;
+    seededDefaultRowsRef.current = true;
+    setFormState(prev => {
+      const seedFinding = { parameter: "", finding: "", source: "Manual" as const };
+      const seedTumorCharacteristic = (site: Partial<NonNullable<typeof prev.tumorCharacteristicsTable>[number]> = {}) => ({
+        primary_cancer_site_parameter: "",
+        primary_cancer_site: "",
+        histological_type_parameter: "",
+        histological_type: "",
+        histological_grade: "",
+        diagnosis_date: "",
+        diagnostic_modality_parameter: "",
+        diagnostic_modality: "",
+        laterality: "",
+        primary_count: "",
+        synchronous_malignancy: "",
+        metachronous_malignancy: "",
+        tumor_size_length: "",
+        tumor_size_width: "",
+        tumor_size_depth: "",
+        tumor_size_unit: "mm",
+        nodal_metastasis_details: "",
+        distant_metastasis_details: "",
+        tumor_differentiation_status: "",
+        pathological_interpretation: "",
+        pathology_reporting_status: "",
+        pathology_reporting_date: "",
+        risk_stratification: "",
+        genomic_risk_score: "",
+        tumor_associated_macrophages: "",
+        stroma_percentage: "",
+        tumor_infiltrating_lymphocytes: "",
+        mitotic_rate: "",
+        molecular_markers_parameter: "",
+        molecular_markers: "",
+        molecular_markers_entries: [seedFinding],
+        immunohistochemistry_parameter: "",
+        immunohistochemistry: "",
+        immunohistochemistry_entries: [seedFinding],
+        genomic_testing_parameter: "",
+        genomic_testing: "",
+        genomic_testing_entries: [seedFinding],
+        gene_expression_profile_parameter: "",
+        gene_expression_profile: "",
+        gene_expression_profile_entries: [seedFinding],
+        viral_status_parameter: "",
+        viral_status: "",
+        cell_morphology_parameter: "",
+        cell_morphology: "",
+        biology_summary: "",
+        sampling_confirmation: "",
+        ...site,
+      });
+      return {
+        ...prev,
+        presentingComplaintsTable: (prev.presentingComplaintsTable?.length ? prev.presentingComplaintsTable : [{ date: "", complaint: "", notes: "" }]),
+        pastMedicalTable: (prev.pastMedicalTable?.length ? prev.pastMedicalTable : [{ date: "", comorbidity: "", notes: "" }]),
+        pastSurgicalTable: (prev.pastSurgicalTable?.length ? prev.pastSurgicalTable : [{ date: "", surgery: "", complication: "", notes: "" }]),
+        priorChemoTable: (prev.priorChemoTable?.length ? prev.priorChemoTable : [{ date: "", agent: "", dose: "", frequency: "", duration: "", cancer_type: "", adverse_effects: "", notes: "" }]),
+        priorRadioTable: (prev.priorRadioTable?.length ? prev.priorRadioTable : [{ date: "", agent: "", dose: "", frequency: "", duration: "", cancer_type: "", adverse_effects: "", notes: "" }]),
+        priorImmunoTable: (prev.priorImmunoTable?.length ? prev.priorImmunoTable : [{ date: "", agent: "", dose: "", frequency: "", duration: "", cancer_type: "", adverse_effects: "", notes: "" }]),
+        priorHormoneTable: (prev.priorHormoneTable?.length ? prev.priorHormoneTable : [{ date: "", agent: "", dose: "", frequency: "", duration: "", cancer_type: "", adverse_effects: "", notes: "" }]),
+        priorTargetedTable: (prev.priorTargetedTable?.length ? prev.priorTargetedTable : [{ date: "", agent: "", dose: "", frequency: "", duration: "", cancer_type: "", adverse_effects: "", notes: "" }]),
+        drugTable: (prev.drugTable?.length ? prev.drugTable : [{ drug_name: "", dose: "", frequency: "", route: "", duration: "", notes: "" }]),
+        familyTable: (prev.familyTable?.length ? prev.familyTable : [{ comorbidity: "", relationship: "", family_notes: "" }]),
+        riskTable: (prev.riskTable?.length ? prev.riskTable : [{ risk_factor: "", risk_notes: "" }]),
+        examFindingsTable: (prev.examFindingsTable?.length ? prev.examFindingsTable : [{ date: "", entries: [{ organ_system: "", findings: "", notes: "" }] }]),
+        anthropometricTable: (prev.anthropometricTable?.length ? prev.anthropometricTable : [{ date: "", height: "", weight: "", bmi: "", bsa: "" }]),
+        otherAnthropometricTable: (prev.otherAnthropometricTable?.length ? prev.otherAnthropometricTable : [{ date: "", entries: [{ measure: "", value: "", unit: "" }] }]),
+        bloodTable: (prev.bloodTable?.length ? prev.bloodTable : [{ blood_type: "", blood_purpose: "", blood_date: "", blood_findings: "", blood_notes: "" }]),
+        tumorMarkersTable: (prev.tumorMarkersTable?.length ? prev.tumorMarkersTable : [{ marker_name: "", marker_value: "", marker_unit: "", marker_date: "", marker_purpose: "", marker_ref_range: "", marker_notes: "" }]),
+        imagingTable: (prev.imagingTable?.length ? prev.imagingTable : [{ imaging_type: "CT Chest/Abdomen", imaging_purpose: "Diagnosis", imaging_date: "", imaging_parameter: "", imaging_findings: "", mass_present: "", mass_size: "", mass_location: "", calcifications: "", lymph_nodes: "", metastasis: "", ascites: "", pv_status: "", sma_status: "" }]),
+        endoscopyTable: (prev.endoscopyTable?.length ? prev.endoscopyTable : [{ endo_type: "Colonoscopy", endo_purpose: "Diagnosis", endo_date: "", endo_parameter: "", endo_findings: "" }]),
+        otherInvTable: (prev.otherInvTable?.length ? prev.otherInvTable : [{ otherinv_type: "", otherinv_purpose: "", otherinv_date: "", otherinv_parameter: "", otherinv_findings: "" }]),
+        geneticTable: (prev.geneticTable?.length ? prev.geneticTable : [{ test_name: "", gene: "", variant: "", result: "", method: "", date: "", purpose: "", notes: "" }]),
+        contrastTable: (prev.contrastTable?.length ? prev.contrastTable : [{ study_type: "", contrast_agent: "", body_part: "", findings: "", date: "", purpose: "", notes: "" }]),
+        biopsyTable: (prev.biopsyTable?.length ? prev.biopsyTable : [{ biopsy_type: "True-cut Biopsy", biopsy_purpose: "confirmation", biopsy_date: "", biopsy_parameter: "", biopsy_findings: "", biopsy_stage: "", lvi: "", perineural_invasion: "", margin_status: "", cell_type: "", metastasis: "", lymph_nodes: "" }]),
+        immunohistochemistryTable: (prev.immunohistochemistryTable?.length ? prev.immunohistochemistryTable : [{ ihc_specimen: "", ihc_panel: "", ihc_marker: "", ihc_result: "", ihc_intensity: "", ihc_percentage: "", ihc_score: "", ihc_pattern: "", ihc_method: "IHC", ihc_date: "", ihc_purpose: "", ihc_lab: "", ihc_pathologist: "", ihc_interpretation: "", ihc_notes: "" }]),
+        supplementaryDetailsTable: (prev.supplementaryDetailsTable?.length ? prev.supplementaryDetailsTable : [{ detail_heading: "", detail_subheading: "", detail_label: "", detail_value: "", detail_unit: "", detail_date: "", detail_priority: "medium", detail_category: "", detail_source: "", detail_notes: "" }]),
+        stagingTable: (prev.stagingTable?.length ? prev.stagingTable : [{ staging_system: "", staging_notes: "" }]),
+        clinicalStagingTable: (prev.clinicalStagingTable?.length ? prev.clinicalStagingTable : [{ staging_system: "", staging_type: "", staging_date: "", staging_notes: "", clinical_t: "", clinical_n: "", clinical_m: "", pathological_t: "", pathological_n: "", pathological_m: "", clinical_stage_group: "", pathological_stage_group: "", figo_stage: "", ann_arbor_stage: "", ann_arbor_modifier: "", lugano_stage: "", lugano_modifier: "", binet_stage: "", rai_stage: "", child_pugh_grade: "", child_pugh_points: "", bclc_stage: "", dukes_stage: "", iss_stage: "", riss_stage: "", gleason_score: "", gleason_grade_group: "", inss_stage: "", inrg_stage: "", nwts_stage: "", masaoka_stage: "", who_cns_grade: "", chang_stage: "", iblp_stage: "", hklc_stage: "", clark_level: "", breslow_thickness: "" }]),
+        histologyGradingTable: (prev.histologyGradingTable?.length ? prev.histologyGradingTable : [{ grading_system: "", grading_date: "", grading_notes: "", histological_grade: "", histological_grade_description: "", differentiation: "", nuclear_grade: "", mitotic_count: "", mitotic_score: "", ki67_percentage: "", lymphovascular_invasion: "", perineural_invasion: "", tumor_budding: "", necrosis: "", cellularity: "", nottingham_score: "", nottingham_grade: "", nottingham_tubule_score: "", nottingham_nuclear_score: "", nottingham_mitotic_score: "", fuhrman_grade: "", isup_grade: "", who_isup_grade: "", gleason_primary: "", gleason_secondary: "", gleason_score: "", gleason_grade_group: "", figo_grade: "", who_cns_grade: "", lepidic_pattern: "", acinar_pattern: "", papillary_pattern: "", micropapillary_pattern: "", solid_pattern: "", tumor_differentiation: "", mucinous_component: "", signet_ring_cells: "", medullary_features: "", sarcoma_grade: "", mitoses_per_10hpf: "", tumor_necrosis_percentage: "" }]),
+        adjuvantTherapyTable: (prev.adjuvantTherapyTable?.length ? prev.adjuvantTherapyTable : [{ therapy_type: "", date_of_commencement: "", regimen: "", cycles_dose: "", details: "", notes: "" }]),
+        preOperativeAssessmentTable: (prev.preOperativeAssessmentTable?.length ? prev.preOperativeAssessmentTable : [{ surgery_name: "", assessment_date: "", lab_hb: "", lab_wbc: "", lab_platelets: "", lab_creatinine: "", lab_egfr: "", lab_albumin: "", lab_inr: "", lab_aptt: "", lab_alt: "", lab_ast: "", lab_bilirubin: "", lab_crp: "", lab_troponin: "", lab_bnp: "", lab_blood_group: "", lab_other: "", additional_labs: [], additional_imaging: [], baseline_imaging_type: "", baseline_imaging_date: "", baseline_imaging_findings: "", surgical_candidacy: "", surgical_candidacy_notes: "", asa_class: "", asa_notes: "", margin_status_expectation: "", margin_notes: "", expected_resection_extent: "", expected_resection_notes: "", expected_lymphadenectomy: "", expected_lymph_node_levels: "", expected_lymph_node_count: "", cardiac_assessment_status: "", cardiac_ecg_findings: "", cardiac_echo_findings: "", cardiac_risk_stratification: "", cardiac_clearance: "", cardiac_notes: "", rcri_high_risk_surgery: "", rcri_ischemic_heart_disease: "", rcri_heart_failure: "", rcri_cerebrovascular_disease: "", rcri_insulin_diabetes: "", rcri_renal_dysfunction: "", rcri_score_auto: "", cardiac_risk_manual: "", pulmonary_assessment_status: "", pulmonary_pft_findings: "", pulmonary_imaging_findings: "", pulmonary_risk_stratification: "", pulmonary_clearance: "", pulmonary_notes: "", pulm_age_risk: "", pulm_spo2_risk: "", pulm_upper_surgery: "", pulm_copd: "", pulm_smoking: "", pulm_emergency: "", pulm_risk_score_auto: "", pulmonary_risk_manual: "", liver_assessment_status: "", liver_child_pugh_score: "", liver_child_pugh_grade: "", liver_meld_score: "", liver_meld_na_score: "", liver_albi_grade: "", liver_fibrosis_stage: "", liver_steatosis: "", liver_portal_hypertension: "", liver_notes: "", cp_bilirubin: "", cp_albumin: "", cp_inr: "", cp_ascites: "", cp_encephalopathy: "", cp_score_auto: "", cp_grade_auto: "", child_pugh_manual: "", kidney_assessment_status: "", kidney_ckd_stage: "", kidney_egfr_category: "", kidney_rifle_stage: "", kidney_akin_stage: "", kidney_kdigo_stage: "", kidney_urine_acr: "", kidney_proteinuria: "", kidney_notes: "", metabolic_diabetes_status: "", metabolic_hba1c: "", metabolic_nutritional_status: "", metabolic_risk_stratification: "", metabolic_notes: "", met_waist_cm: "", met_bp_systolic: "", met_bp_diastolic: "", met_hdl: "", met_triglycerides: "", met_fasting_glucose: "", met_components_count: "", metabolic_risk_manual: "", immunological_status: "", immunological_neutrophil_count: "", immunological_lymphocyte_count: "", immunological_hiv_status: "", immunological_steroid_use: "", immunological_other_immunosuppression: "", immunological_notes: "", possum_physiological_score: "", possum_operative_severity: "", possum_predicted_morbidity: "", possum_predicted_mortality: "", possum_notes: "", possum_age_score: "", possum_cardiac_signs: "", possum_respiratory_signs: "", possum_sbp: "", possum_pulse_rate: "", possum_gcs_score: "", possum_urea_val: "", possum_na_val: "", possum_k_val: "", possum_hb_val: "", possum_wbc_val: "", possum_ecg_abnormal: "", possum_operative_multiple: "", possum_blood_loss_ml: "", possum_peritoneal_soiling: "", possum_malignancy_present: "", possum_urgency: "", possum_phys_score_auto: "", possum_op_score_auto: "", possum_pred_morbidity_auto: "", possum_pred_mortality_auto: "", possum_phys_manual: "", possum_op_manual: "", neoadj_chemo_received: "", neoadj_chemo_regimen: "", neoadj_chemo_cycles: "", neoadj_chemo_completion_date: "", neoadj_chemo_response: "", neoadj_chemo_response_details: "", neoadj_target_count: "", neoadj_target_sum_before: "", neoadj_target_sum_after: "", neoadj_pct_change_auto: "", neoadj_chemo_manual: "", neoadj_radio_received: "", neoadj_radio_regimen: "", neoadj_radio_dose: "", neoadj_radio_completion_date: "", neoadj_radio_response: "", neoadj_radio_response_details: "", neoadj_radio_manual: "", organ_resistance_testing: "", organ_resistance_results: "", organ_resistance_notes: "", mdt_date: "", mdt_participants: "", mdt_recommendation: "", mdt_decision: "", mdt_notes: "" }]),
+        definitiveSurgeryTable: (prev.definitiveSurgeryTable?.length ? prev.definitiveSurgeryTable : [{ surgery_name: "", surgery_date: "", surgeon_name: "", surgeon_specialty: "", surgeon_volume: "", hospital_name: "", surgery_type: "", surgery_intent: "", surgery_phase: "", surgery_timing: "", preop_diagnosis: "", indication_for_surgery: "", anesthesia_type: "", operative_duration_min: "", incision_to_closure: "", estimated_blood_loss_ml: "", intraop_fluids_ml: "", intraop_blood_transfusion: "", intraop_complications: "", intraop_findings: "", specimen_description: "", intraop_imaging: "", intraop_imaging_list: [], surgery_approach: "", surgery_site: "", procedure_details: "", resection_status: "", margin_status: "", closest_margin_mm: "", lymph_node_dissection: "", lymph_node_harvested: "", lymph_node_positive: "", organ_resection_details: "", multi_visceral_resection: "", sentinel_node_biopsy: "", sentinel_node_biopsy_results: "", neoadj_effect_details: "", en_bloc_resection: "", depth_of_invasion: "", resected_specimen_size: "", conversion_to_open: "", reconstruction_type: "", reconstruction_details: "", postop_diagnosis: "", recovery_status: "", discharge_date: "", discharge_status: "", readmission_30d: "", readmission_reason: "", pathology_specimen_id: "", pathology_link: "", surgery_notes: "" }]),
+        treatmentOutcomeTable: (prev.treatmentOutcomeTable?.length ? prev.treatmentOutcomeTable : [{ assessment_date: "", response_evaluation_criteria: "", overall_response: "", target_lesion_response: "", non_target_lesion_response: "", new_lesions: "", progression_date: "", recurrence_status: "", recurrence_date: "", recurrence_location: "", survival_status: "", survival_date: "", cause_of_death: "", ecog_status: "", tumor_markers_followup: "", imaging_followup: "", outcome_notes: "", hospital_entry_date: "", hospital_exit_date: "", hospital_stay_days: "", icu_admission: "", icu_admit_date: "", icu_exit_date: "", icu_stay_days: "", return_to_or_30d: "", transfusion_needed: "", transfusion_type: "", transfusion_amount: "", wound_infection: "", anastomotic_leak: "", thromboembolic_events: "", cardiac_complication: "", cardiac_complication_details: "", pulmonary_complication: "", pulmonary_complication_details: "", acute_kidney_injury: "", hepatic_dysfunction: "", anastomotic_stricture: "", lymphoedema: "", seroma_hematoma: "", nerve_injury: "", fistula_formation: "", sepsis_development: "", mortality_90d: "", mortality_1y: "", mortality_30d: "", unplanned_readmission: "", discharge_destination: "", clavien_dindo_grade: "", clavien_dindo_criteria: "", severe_complication_rate_criteria: "", icu_management_details: "", ward_management_details: "", postop_monitoring: [], postop_complications: [], reference_surgery_date: "" }]),
+        afterSurgicalTherapiesTable: (prev.afterSurgicalTherapiesTable?.length ? prev.afterSurgicalTherapiesTable : [{ therapy_type: "", start_date: "", end_date: "", regimen: "", cycles_dose: "", details: "", notes: "", diagnosis_date_ref: "", first_therapy_date: "", days_diag_to_therapy: "", chemo_dose_intensity: "", chemo_toxicity_grade: "", radiation_dose_modifications: "", treatment_adherence: "", treatment_related_mortality: "", late_toxicity: "" }]),
+        followUpPrognosisTable: (prev.followUpPrognosisTable?.length ? prev.followUpPrognosisTable : [{ second_cancer_development: "", second_cancer_details: "", cancer_specific_survival: "", conditional_survival_details: "", qol_assessment_done: "", qol_score_system: "", qol_parameters: "", qol_score: "", functional_recovery: "", genetic_review_done: "", genetic_review_details: "", clinical_trial_enrollment: "", clinical_trial_details: "", readmission_30d: "", readmission_90d: "", follow_up_notes: "" }]),
+        oncologicalOutcomeTable: (prev.oncologicalOutcomeTable?.length ? prev.oncologicalOutcomeTable : [{ assessment_date: "", response_evaluation_criteria: "", overall_response: "", target_lesion_response: "", non_target_lesion_response: "", new_lesions: "", progression_date: "", recurrence_status: "", recurrence_date: "", recurrence_location: "", survival_status: "", survival_date: "", cause_of_death: "", ecog_status: "", tumor_markers_followup: "", imaging_followup: "", outcome_notes: "" }]),
+        tumorCharacteristicsTable: (prev.tumorCharacteristicsTable?.length ? prev.tumorCharacteristicsTable : [seedTumorCharacteristic()]),
+        problemTable: (prev.problemTable?.length ? prev.problemTable : [{ problem: "", management_plan: "" }]),
+        commonDrugsTable: (prev.commonDrugsTable?.length ? prev.commonDrugsTable : [{ common_drug: "", common_dose: "", common_frequency: "", common_drug_notes: "" }]),
+        neoChemoTable: (prev.neoChemoTable?.length ? prev.neoChemoTable : [{ neo_chemo_drug: "", neo_chemo_dose: "", neo_chemo_freq: "", neo_chemo_route: "", neo_chemo_cycles: "", neo_chemo_effects: "", neo_chemo_notes: "" }]),
+        adjChemoTable: (prev.adjChemoTable?.length ? prev.adjChemoTable : [{ neo_chemo_drug: "", neo_chemo_dose: "", neo_chemo_freq: "", neo_chemo_route: "", neo_chemo_cycles: "", neo_chemo_effects: "", neo_chemo_notes: "" }]),
+        neoRadioTable: (prev.neoRadioTable?.length ? prev.neoRadioTable : [{ neo_radio_comp: "", neo_radio_dose: "", neo_radio_freq: "", neo_radio_route: "", neo_radio_cycles: "", neo_radio_effects: "", neo_radio_notes: "" }]),
+        adjRadioTable: (prev.adjRadioTable?.length ? prev.adjRadioTable : [{ neo_radio_comp: "", neo_radio_dose: "", neo_radio_freq: "", neo_radio_route: "", neo_radio_cycles: "", neo_radio_effects: "", neo_radio_notes: "" }]),
+        surgeryTable: (prev.surgeryTable?.length ? prev.surgeryTable : [{ surgery_name: "", surgery_date: "", surgery_site: "", surgery_approach: "", surgery_findings: "", drain_status: "", drain_volume: "", surgery_notes: "" }]),
+        complicationTable: (prev.complicationTable?.length ? prev.complicationTable : [{ complication: "", post_op_duration: "", management: "", notes: "" }]),
+        monitoringTable: (prev.monitoringTable?.length ? prev.monitoringTable : [{ monitor_param: "", monitor_duration: "", monitor_findings: "", monitor_notes: "" }]),
+        icuTable: (prev.icuTable?.length ? prev.icuTable : [{ icu_date: "", icu_stay: "", icu_mgmt: "", icu_exit: "", icu_notes: "" }]),
+        wardTable: (prev.wardTable?.length ? prev.wardTable : [{ ward_entry: "", ward_stay: "", ward_mgmt: "", ward_exit: "", ward_notes: "" }]),
+      };
+    });
   }, [initialPatientData]);
 
   // Auto-calculate time from first complaint to diagnosis
