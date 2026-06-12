@@ -569,8 +569,6 @@ export default function AddPatientView({
   const vaultFileInputRef = useRef<HTMLInputElement>(null);
   const sectionFileInputRef = useRef<HTMLInputElement>(null);
   const sectionUploadContextRef = useRef<{ section: string; label: string; useAi: boolean } | null>(null);
-  const firstNameRef = useRef<HTMLInputElement>(null);
-  const lastNameRef = useRef<HTMLInputElement>(null);
   const consentRef = useRef<HTMLInputElement>(null);
 
   const flashShake = (node: HTMLElement | null | undefined) => {
@@ -1756,14 +1754,6 @@ export default function AddPatientView({
       return;
     }
 
-    let missing = false;
-    if (!formState.first_name) { flashShake(firstNameRef.current); missing = true; }
-    if (!formState.last_name) { flashShake(lastNameRef.current); missing = true; }
-    if (missing) {
-      await notify("First Name and Last Name are required clinical fields.", "Required Fields Missing", "warning");
-      return;
-    }
-
     setIsSaving(true);
     try {
       const cc = countryCode.trim() || "+94";
@@ -2295,9 +2285,8 @@ export default function AddPatientView({
               </div>
 
               <div>
-                <label className="block font-bold mb-1 text-slate-800 dark:text-slate-300">First Name *</label>
+                <label className="block font-semibold mb-1 text-slate-800 dark:text-slate-300">First Name</label>
                 <input
-                  ref={firstNameRef}
                   type="text"
                   name="first_name"
                   value={formState.first_name}
@@ -2308,9 +2297,8 @@ export default function AddPatientView({
               </div>
 
               <div>
-                <label className="block font-bold mb-1 text-slate-800 dark:text-slate-300">Last Name *</label>
+                <label className="block font-semibold mb-1 text-slate-800 dark:text-slate-300">Last Name</label>
                 <input
-                  ref={lastNameRef}
                   type="text"
                   name="last_name"
                   value={formState.last_name}
